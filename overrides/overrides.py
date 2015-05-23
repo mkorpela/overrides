@@ -16,10 +16,10 @@
 
 import inspect
 import re
-__VERSION__ = '0.1'
+__VERSION__ = '0.2'
 
 def overrides(method):
-    """Decorator to indicate that the decorated method overrides a method in superclass
+    """Decorator to indicate that the decorated method overrides a method in superclass.
     The decorator code is executed while loading class. Using this method should have minimal runtime performance
     implications.
 
@@ -41,7 +41,8 @@ def overrides(method):
         def method(self):
             return 1
 
-    :raises  AssertionError if no match
+    :raises  AssertionError if no match in super classes for the method name
+    :return  method with possibly added (if the method doesn't have one) docstring from super class
     """
     stack = inspect.stack()
     base_classes = [s.strip() for s in re.search(r'class.+\((.+)\)\s*:', stack[2][4][0]).group(1).split(',')]
@@ -60,9 +61,12 @@ def overrides(method):
                 assert(inspect.ismodule(obj) or inspect.isclass(obj))
                 obj = getattr(obj, c)
             base_classes[i] = obj
-    if not any(hasattr(cls, method.__name__) for cls in base_classes):
-        raise AssertionError('No super class method found for "%s"' % method.__name__)
-    return method
+    for super_class in base_classes:
+        if hasattr(super_class, method.__name__):
+            if not method.__doc__:
+                method.__doc__ = getattr(super_class, method.__name__).__doc__
+            return method
+    raise AssertionError('No super class method found for "%s"' % method.__name__)
 
 
 if __name__ == '__main__':
@@ -70,6 +74,7 @@ if __name__ == '__main__':
     class SuperbDiamondClass(object):
 
         def my_diamond_method(self):
+            """Some docs"""
             pass
 
     class SuperClassA(SuperbDiamondClass):
@@ -96,3 +101,4 @@ if __name__ == '__main__':
         def my_diamond_method(self):
             return 0
 
+    assert(SuperbDiamondClass.my_diamond_method.__doc__ == InheritedClass.my_diamond_method.__doc__)
