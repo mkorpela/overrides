@@ -13,6 +13,7 @@ See http://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-ov
     class SuperClass(object):
 
         def method(self):
+            """This is the doc for method and will be shown in subclass method too!"""
             return 2
 
     class SubClass(SuperClass):
