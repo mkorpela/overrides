@@ -16,7 +16,7 @@
 
 import inspect
 import re
-
+__VERSION__ = '0.1'
 
 def overrides(method):
     """Decorator to indicate that the decorated method overrides a method in superclass
