@@ -16,7 +16,8 @@
 
 import inspect
 import re
-__VERSION__ = '0.2'
+__VERSION__ = '0.3'
+
 
 def overrides(method):
     """Decorator to indicate that the decorated method overrides a method in superclass.
@@ -44,29 +45,29 @@ def overrides(method):
     :raises  AssertionError if no match in super classes for the method name
     :return  method with possibly added (if the method doesn't have one) docstring from super class
     """
-    stack = inspect.stack()
-    base_classes = [s.strip() for s in re.search(r'class.+\((.+)\)\s*:', stack[2][4][0]).group(1).split(',')]
-    if not base_classes:
-        raise ValueError('overrides decorator: unable to determine base class for method "%s"' % method.__name__)
-    # replace each class name in base_classes with the actual class type
-    derived_class_locals = stack[2][0].f_locals
-    for i, base_class in enumerate(base_classes):
-        if '.' not in base_class:
-            base_classes[i] = derived_class_locals[base_class]
-        else:
-            components = base_class.split('.')
-            # obj is either a module or a class
-            obj = derived_class_locals[components[0]]
-            for c in components[1:]:
-                assert(inspect.ismodule(obj) or inspect.isclass(obj))
-                obj = getattr(obj, c)
-            base_classes[i] = obj
-    for super_class in base_classes:
+    for super_class in _get_base_classes(inspect.stack()[2]):
         if hasattr(super_class, method.__name__):
             if not method.__doc__:
                 method.__doc__ = getattr(super_class, method.__name__).__doc__
             return method
     raise AssertionError('No super class method found for "%s"' % method.__name__)
+
+
+def _get_base_classes(class_stack_element):
+    base_class_names = [s.strip() for s in
+                        re.search(r'class.+\((.+)\)\s*:',
+                                  class_stack_element[4][0]).group(1).split(',')]
+    if not base_class_names:
+        raise ValueError('overrides decorator: unable to determine base class')
+    return [_get_base_class(class_name, class_stack_element[0].f_locals) for class_name in base_class_names]
+
+
+def _get_base_class(class_name, derived_class_locals):
+    components = class_name.split('.')
+    obj = derived_class_locals[components[0]]
+    for component in components[1:]:
+        obj = getattr(obj, component)
+    return obj
 
 
 if __name__ == '__main__':
