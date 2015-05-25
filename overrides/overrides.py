@@ -53,53 +53,18 @@ def overrides(method):
     raise AssertionError('No super class method found for "%s"' % method.__name__)
 
 
-def _get_base_classes(class_stack_element):
+def _get_base_classes(class_stack_element, namespace):
     base_class_names = [s.strip() for s in
                         re.search(r'class.+\((.+)\)\s*:',
                                   class_stack_element[4][0]).group(1).split(',')]
     if not base_class_names:
         raise ValueError('overrides decorator: unable to determine base class')
-    return [_get_base_class(class_name, class_stack_element[0].f_locals) for class_name in base_class_names]
+    return [_get_base_class(class_name, namespace) for class_name in base_class_names]
 
 
-def _get_base_class(class_name, derived_class_locals):
+def _get_base_class(class_name, namespace):
     components = class_name.split('.')
-    obj = derived_class_locals[components[0]]
+    obj = namespace[components[0]]
     for component in components[1:]:
         obj = getattr(obj, component)
     return obj
-
-
-if __name__ == '__main__':
-
-    class SuperbDiamondClass(object):
-
-        def my_diamond_method(self):
-            """Some docs"""
-            pass
-
-    class SuperClassA(SuperbDiamondClass):
-
-        def super_class_method_a(self):
-            pass
-
-    class SuperClassB(SuperbDiamondClass):
-
-        def super_class_method_b(self):
-            pass
-
-    class InheritedClass(SuperClassA, SuperClassB):
-
-        @overrides
-        def super_class_method_a(self):
-            return 2
-
-        @overrides
-        def super_class_method_b(self):
-            return 1
-
-        @overrides
-        def my_diamond_method(self):
-            return 0
-
-    assert(SuperbDiamondClass.my_diamond_method.__doc__ == InheritedClass.my_diamond_method.__doc__)
