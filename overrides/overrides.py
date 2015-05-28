@@ -19,6 +19,9 @@ import dis
 __VERSION__ = '0.3'
 
 
+if sys.version > '3':
+    long = int
+
 def overrides(method):
     """Decorator to indicate that the decorated method overrides a method in superclass.
     The decorator code is executed while loading class. Using this method should have minimal runtime performance
@@ -75,7 +78,7 @@ def _get_base_class_names(co, lasti=-1):
             extended_arg = 0
             i += 2
             if op == dis.EXTENDED_ARG:
-                extended_arg = oparg*65536L
+                extended_arg = oparg*long(65536)
             if op in dis.hasconst:
                 if type(co.co_consts[oparg]) == str:
                     extends = []
