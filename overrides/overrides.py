@@ -14,8 +14,8 @@
 #  limitations under the License.
 #
 
-import inspect
-import re
+import sys
+import dis
 __VERSION__ = '0.3'
 
 
@@ -45,22 +45,57 @@ def overrides(method):
     :raises  AssertionError if no match in super classes for the method name
     :return  method with possibly added (if the method doesn't have one) docstring from super class
     """
-    for super_class in _get_base_classes(inspect.stack()[2]):
+    frame = sys._getframe(2)
+    for super_class in _get_base_classes(frame.f_code, frame.f_lasti, method.__globals__):
         if hasattr(super_class, method.__name__):
             if not method.__doc__:
                 method.__doc__ = getattr(super_class, method.__name__).__doc__
             return method
     raise AssertionError('No super class method found for "%s"' % method.__name__)
 
+def _get_base_classes(f_code, f_lasti, namespace):
+    return [_get_base_class(class_name, namespace) for class_name in _get_base_class_names(f_code, f_lasti)]
 
-def _get_base_classes(class_stack_element, namespace):
-    base_class_names = [s.strip() for s in
-                        re.search(r'class.+\((.+)\)\s*:',
-                                  class_stack_element[4][0]).group(1).split(',')]
-    if not base_class_names:
-        raise ValueError('overrides decorator: unable to determine base class')
-    return [_get_base_class(class_name, namespace) for class_name in base_class_names]
-
+def _get_base_class_names(co, lasti=-1):
+    """Get baseclass names from the code object"""
+    code = co.co_code
+    n = len(code)
+    i = 0
+    extended_arg = 0
+    stop = False
+    extends = []
+    while not stop and i < n:
+        c = code[i]
+        op = ord(c)
+        if i == lasti:
+            stop = True
+        i += 1
+        if op >= dis.HAVE_ARGUMENT:
+            oparg = ord(code[i]) + ord(code[i+1])*256 + extended_arg
+            extended_arg = 0
+            i += 2
+            if op == dis.EXTENDED_ARG:
+                extended_arg = oparg*65536L
+            if op in dis.hasconst:
+                if type(co.co_consts[oparg]) == str:
+                    extends = []
+            elif op in dis.hasname:
+                if dis.opname[op] == 'LOAD_NAME':
+                    extends.append(('name', co.co_names[oparg]))
+                if dis.opname[op] == 'LOAD_ATTR':
+                    extends.append(('attr', co.co_names[oparg]))
+    items = []
+    previous_item = None
+    for t, s in extends:
+        if t == 'name':
+            if previous_item:
+                items.append(previous_item)
+            previous_item = s
+        else:
+            previous_item += '.' + s
+    if previous_item:
+        items.append(previous_item)
+    return items
 
 def _get_base_class(class_name, namespace):
     components = class_name.split('.')

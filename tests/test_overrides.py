@@ -31,6 +31,10 @@ class Sub2(somepackage.SomeClass,
     def somewhat_fun_method(self):
         return 'foo'
 
+    @overrides
+    def some_method(self):
+        pass
+
 
 class OverridesTests(unittest.TestCase):
 
