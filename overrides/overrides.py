@@ -16,7 +16,7 @@
 
 import sys
 import dis
-__VERSION__ = '0.4'
+__VERSION__ = '0.5'
 
 
 if sys.version > '3':
