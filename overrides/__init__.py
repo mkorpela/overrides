@@ -1,2 +1,2 @@
-from overrides import overrides
-from overrides import __VERSION__
+from overrides.overrides import overrides
+from overrides.overrides import __VERSION__
