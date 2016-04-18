@@ -67,10 +67,10 @@ def _get_base_class_names(frame):
     extends = []
     while i <= lasti:
         c = code[i]
-        op = ord(c)
+        op = c
         i += 1
         if op >= dis.HAVE_ARGUMENT:
-            oparg = ord(code[i]) + ord(code[i+1])*256 + extended_arg
+            oparg = code[i] + code[i+1]*256 + extended_arg
             extended_arg = 0
             i += 2
             if op == dis.EXTENDED_ARG:
