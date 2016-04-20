@@ -38,9 +38,8 @@ def overrides(method):
     from overrides import overrides
 
     class SuperClass(object):
-
         def method(self):
-            return 2
+          return 2
 
     class SubClass(SuperClass):
 
@@ -49,8 +48,8 @@ def overrides(method):
             return 1
 
     :raises  AssertionError if no match in super classes for the method name
-    :return  method with possibly added (if the method doesn't have one) 
-    docstring from super class
+    :return  method with possibly added (if the method doesn't have one)
+        docstring from super class
     """
     for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
         if hasattr(super_class, method.__name__):
@@ -58,16 +57,16 @@ def overrides(method):
                 method.__doc__ = getattr(super_class, method.__name__).__doc__
             return method
     raise AssertionError('No super class method found for "%s"' %
-    	method.__name__)
+                         method.__name__)
 
 
 def _get_base_classes(frame, namespace):
-    return [_get_base_class(class_name_components, namespace) for \
-	class_name_components in _get_base_class_names(frame)]
+    return [_get_base_class(class_name_components, namespace) for
+            class_name_components in _get_base_class_names(frame)]
 
 
 def _get_base_class_names(frame):
-    """Get baseclass names from the code object"""
+    """ Get baseclass names from the code object """
     co, lasti = frame.f_code, frame.f_lasti
     code = co.co_code
     i = 0
@@ -110,4 +109,3 @@ def _get_base_class(components, namespace):
     for component in components[1:]:
         obj = getattr(obj, component)
     return obj
-
