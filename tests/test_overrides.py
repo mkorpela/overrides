@@ -16,6 +16,7 @@ class SubClass(SuperClass):
     def some_method(self):
         return 'sub'
 
+
 class Subber(SuperClass):
 
     @overrides
@@ -38,22 +39,22 @@ class Sub2(test_somepackage.SomeClass,
 
 class OverridesTests(unittest.TestCase):
 
-    def test_that_overrides_passes_for_same_package_superclass(self):
+    def test_overrides_passes_for_same_package_superclass(self):
         sub = SubClass()
         self.assertEqual(sub.some_method(), 'sub')
         self.assertEqual(sub.some_method.__doc__, 'Super Class Docs')
 
-    def test_that_overrides_does_not_override_method_doc(self):
+    def test_overrides_does_not_override_method_doc(self):
         sub = Subber()
         self.assertEqual(sub.some_method(), 1)
         self.assertEqual(sub.some_method.__doc__, 'Subber')
 
-    def test_that_overrides_passes_for_superclass_in_another_package(self):
+    def test_overrides_passes_for_superclass_in_another_package(self):
         sub2 = Sub2()
         self.assertEqual(sub2.somewhat_fun_method(), 'foo')
         self.assertEqual(sub2.somewhat_fun_method.__doc__, 'LULZ')
 
-    def test_that_assertion_error_is_thrown_when_method_not_in_superclass(self):
+    def test_assertion_error_is_thrown_when_method_not_in_superclass(self):
         try:
             class ShouldFail(SuperClass):
                 @overrides
@@ -66,3 +67,4 @@ class OverridesTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
