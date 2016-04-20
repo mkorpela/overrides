@@ -1,6 +1,6 @@
 import sys
 
-if sys.version < 3:
+if sys.version < '3':
     from overrides import overrides
     from overrides import __VERSION__
 else:
