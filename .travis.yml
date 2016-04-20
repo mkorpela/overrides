@@ -9,12 +9,12 @@ python:
   - "nightly" # currently points to 3.6-dev
   # command to install dependencies
 install:
-  - "pip install pytest-cov"
-  - "pip install pytest-pep8"
+  - "pip install nose-cov"
+  - "pip install tissue"
   - "pip install coveralls"
   - "pip install ."
   # command to run tests
 script:
-  - py.test tests/ --pep8 overrides -v --cov overrides --cov-report term-missing
+  - nosetest --with-cov --with-tissue --cov=overrides --cov-report term-missing
 after_success:
   - coveralls
