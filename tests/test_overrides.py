@@ -1,6 +1,6 @@
 import unittest
 from overrides import overrides
-import somepackage
+import test_somepackage
 
 
 class SuperClass(object):
@@ -24,7 +24,7 @@ class Subber(SuperClass):
         return 1
 
 
-class Sub2(somepackage.SomeClass,
+class Sub2(test_somepackage.SomeClass,
            SuperClass):
 
     @overrides
