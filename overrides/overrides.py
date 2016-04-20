@@ -19,7 +19,12 @@ import dis
 __VERSION__ = '0.5'
 
 
-if sys.version > '3':
+if sys.version < '3':
+    def itemint(x):
+        return ord(x)
+else:
+    def itemint(x):
+        return x
     long = int
 
 
@@ -74,10 +79,10 @@ def _get_base_class_names(frame):
     extends = []
     while i <= lasti:
         c = code[i]
-        op = c
+        op = itemint(c)
         i += 1
         if op >= dis.HAVE_ARGUMENT:
-            oparg = code[i] + code[i+1]*256 + extended_arg
+            oparg = itemint(code[i]) + itemint(code[i+1])*256 + extended_arg
             extended_arg = 0
             i += 2
             if op == dis.EXTENDED_ARG:
