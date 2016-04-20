@@ -60,7 +60,7 @@ class OverridesTests(unittest.TestCase):
                 def somo_method(self):
                     pass
             raise RuntimeError('Should not go here')
-        except AssertionError, expected:
+        except AssertionError:
             pass
 
 
