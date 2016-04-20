@@ -1,4 +1,5 @@
-# overrides
+# overrides [![Build Status](https://travis-ci.org/drorasaf/overrides.svg?branch=python3_support)](https://travis-ci.org/drorasaf/overrides)
+
 A decorator to automatically detect mismatch when overriding a method.
 See http://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-overriding-a-method
 
