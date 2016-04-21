@@ -7,11 +7,22 @@ name = 'Mikko Korpela'
 # I might be just a little bit too much afraid of those bots..
 address = name.lower().replace(' ', '.')+chr(64)+'gmail.com'
 
+desc = 'A decorator to automatically detect mismatch when overriding a method.'
+
 setup(name='overrides',
       version='0.5',
-      description='A decorator to automatically detect mismatch when overriding a method.',
+      description=desc,
       author=name,
       author_email=address,
       url='https://github.com/mkorpela/overrides',
       packages=find_packages(),
-      license='Apache License, Version 2.0')
+      license='Apache License, Version 2.0',
+      keywords=['override', 'inheritence', 'OOP'],
+      classifiers=[
+          'Intended Audience :: Developers',
+          'Natural Language :: English',
+          'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          ]
+      )
