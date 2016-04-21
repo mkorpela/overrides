@@ -16,8 +16,7 @@
 
 import sys
 import dis
-__VERSION__ = '0.5'
-
+__VERSION__ = '1.6'
 
 if sys.version < '3':
     def itemint(x):
