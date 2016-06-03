@@ -95,6 +95,8 @@ def _get_base_class_names(frame):
                     extends.append(('name', co.co_names[oparg]))
                 if dis.opname[op] == 'LOAD_ATTR':
                     extends.append(('attr', co.co_names[oparg]))
+                if dis.opname[op] == 'LOAD_GLOBAL':
+                    extends.append(('name', co.co_names[oparg]))
     items = []
     previous_item = []
     for t, s in extends:
