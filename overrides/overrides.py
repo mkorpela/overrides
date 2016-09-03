@@ -58,8 +58,14 @@ def overrides(method):
     """
     for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
         if hasattr(super_class, method.__name__):
+            super_method = getattr(super_class, method.__name__)
+            if hasattr(super_method, "__finalized__"):
+                finalized = getattr(super_method, "__finalized__")
+                if finalized:
+                    raise AssertionError('Method "%s" is finalized' %
+                                         method.__name__)
             if not method.__doc__:
-                method.__doc__ = getattr(super_class, method.__name__).__doc__
+                method.__doc__ = super_method.__doc__
             return method
     raise AssertionError('No super class method found for "%s"' %
                          method.__name__)
@@ -95,6 +101,8 @@ def _get_base_class_names(frame):
                     extends.append(('name', co.co_names[oparg]))
                 if dis.opname[op] == 'LOAD_ATTR':
                     extends.append(('attr', co.co_names[oparg]))
+                if dis.opname[op] == 'LOAD_GLOBAL':
+                    extends.append(('name', co.co_names[oparg]))
     items = []
     previous_item = []
     for t, s in extends:
