@@ -74,34 +74,73 @@ def _get_base_classes(frame, namespace):
     return [_get_base_class(class_name_components, namespace) for
             class_name_components in _get_base_class_names(frame)]
 
+if sys.version < '3.6':
+    def op_stream(code, max):
+        """Generator function: convert Python bytecode into a sequence of
+        opcode-argument pairs."""
+        i = [0]
+
+        def next():
+            val = itemint(code[i[0]])
+            i[0] += 1
+            return val
+
+        ext_arg = 0
+        while i[0] <= max:
+            op = next()
+            if op > dis.HAVE_ARGUMENT:
+                arg = next() + next() << 8
+            else:
+                assert ext_arg == 0
+                arg = 0  # unused
+
+            if op == dis.EXTENDED_ARG:
+                ext_arg += arg
+                ext_arg <<= 16
+                continue
+            else:
+                yield (op, arg + ext_arg)
+                ext_arg = 0
+else:
+    def op_stream(code, max):
+        """Generator function: convert Python bytecode into a sequence of
+        opcode-argument pairs."""
+        i = [0]
+        def next():
+            val = itemint(code[i[0]])
+            i[0] += 1
+            return val
+
+        ext_arg = 0
+        while i[0] <= max:
+            op, arg = next(), next()
+            if op == dis.EXTENDED_ARG:
+                ext_arg += arg
+                ext_arg <<= 8
+                continue
+            else:
+                yield (op, arg + ext_arg)
+                ext_arg = 0
+
 
 def _get_base_class_names(frame):
     """ Get baseclass names from the code object """
     co, lasti = frame.f_code, frame.f_lasti
     code = co.co_code
-    i = 0
-    extended_arg = 0
+
     extends = []
-    while i <= lasti:
-        c = code[i]
-        op = itemint(c)
-        i += 1
-        if op >= dis.HAVE_ARGUMENT:
-            oparg = itemint(code[i]) + itemint(code[i+1])*256 + extended_arg
-            extended_arg = 0
-            i += 2
-            if op == dis.EXTENDED_ARG:
-                extended_arg = oparg*long(65536)
-            if op in dis.hasconst:
-                if type(co.co_consts[oparg]) == str:
-                    extends = []
-            elif op in dis.hasname:
-                if dis.opname[op] == 'LOAD_NAME':
-                    extends.append(('name', co.co_names[oparg]))
-                if dis.opname[op] == 'LOAD_ATTR':
-                    extends.append(('attr', co.co_names[oparg]))
-                if dis.opname[op] == 'LOAD_GLOBAL':
-                    extends.append(('name', co.co_names[oparg]))
+    for (op, oparg) in op_stream(code, lasti):
+        if op in dis.hasconst:
+            if type(co.co_consts[oparg]) == str:
+                extends = []
+        elif op in dis.hasname:
+            if dis.opname[op] == 'LOAD_NAME':
+                extends.append(('name', co.co_names[oparg]))
+            if dis.opname[op] == 'LOAD_ATTR':
+                extends.append(('attr', co.co_names[oparg]))
+            if dis.opname[op] == 'LOAD_GLOBAL':
+                extends.append(('name', co.co_names[oparg]))
+
     items = []
     previous_item = []
     for t, s in extends:
