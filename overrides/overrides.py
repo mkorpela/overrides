@@ -156,7 +156,10 @@ def _get_base_class_names(frame):
 
 
 def _get_base_class(components, namespace):
-    obj = namespace[components[0]]
+    try:
+        obj = namespace[components[0]]
+    except KeyError:
+        obj = namespace["__builtins__"][components[0]]
     for component in components[1:]:
         obj = getattr(obj, component)
     return obj
