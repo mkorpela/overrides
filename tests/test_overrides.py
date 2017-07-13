@@ -36,6 +36,11 @@ class Sub2(test_somepackage.SomeClass,
     def some_method(self):
         pass
 
+class SubclassOfInt(int):
+
+    @overrides
+    def __str__(self):
+        return "subclass of int"
 
 class OverridesTests(unittest.TestCase):
 
@@ -64,6 +69,9 @@ class OverridesTests(unittest.TestCase):
         except AssertionError:
             pass
 
+    def test_can_override_builtin(self):
+        x = SubclassOfInt(10)
+        self.assertEqual(str(x), 'subclass of int')
 
 if __name__ == '__main__':
     unittest.main()
