@@ -10,8 +10,8 @@ overrides
 .. image:: https://img.shields.io/pypi/v/overrides.svg
         :target: https://pypi.python.org/pypi/overrides
 
-.. image:: https://img.shields.io/pypi/dm/overrides.svg
-        :target: https://pypi.python.org/pypi/overrides
+.. image:: http://pepy.tech/badge/overrides
+        :target: http://pepy.tech/project/overrides
 
 A decorator to automatically detect mismatch when overriding a method.
 See http://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-overriding-a-method
