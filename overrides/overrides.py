@@ -129,17 +129,22 @@ def _get_base_class_names(frame):
     code = co.co_code
 
     extends = []
+    add_last_step = False
     for (op, oparg) in op_stream(code, lasti):
-        if op in dis.hasconst:
-            if type(co.co_consts[oparg]) == str:
+        if op in dis.hasname:
+            if not add_last_step:
                 extends = []
-        elif op in dis.hasname:
             if dis.opname[op] == 'LOAD_NAME':
                 extends.append(('name', co.co_names[oparg]))
-            if dis.opname[op] == 'LOAD_ATTR':
+                add_last_step = True
+            elif dis.opname[op] == 'LOAD_ATTR':
                 extends.append(('attr', co.co_names[oparg]))
-            if dis.opname[op] == 'LOAD_GLOBAL':
+                add_last_step = True
+            elif dis.opname[op] == 'LOAD_GLOBAL':
                 extends.append(('name', co.co_names[oparg]))
+                add_last_step = True
+            else:
+                add_last_step = False
 
     items = []
     previous_item = []

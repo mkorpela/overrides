@@ -1,7 +1,25 @@
 import unittest
+import sys
 from overrides import overrides
 import test_somepackage
 
+if sys.version >= '3.5':
+    from typing import Generic, TypeVar
+
+    TObject = TypeVar("TObject", bound="Foo")
+
+
+    class SubClassOfGeneric(Generic[TObject]):
+        def some_method(self):
+            """Generic sub class."""
+            pass
+
+
+    class SubSubClassOfGeneric(SubClassOfGeneric["SubSubClassOfGeneric"]):
+
+        @overrides
+        def some_method(self):
+            return 17
 
 class SuperClass(object):
 
@@ -72,6 +90,12 @@ class OverridesTests(unittest.TestCase):
     def test_can_override_builtin(self):
         x = SubclassOfInt(10)
         self.assertEqual(str(x), 'subclass of int')
+
+    if sys.version >= '3.5':
+        def test_overrides_method_from_generic_subclass(self):
+            genericsub = SubSubClassOfGeneric()
+            self.assertEqual(genericsub.some_method(), 17)
+            self.assertEqual(genericsub.some_method.__doc__, 'Generic sub class.')
 
 if __name__ == '__main__':
     unittest.main()
