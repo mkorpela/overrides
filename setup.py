@@ -10,7 +10,7 @@ address = name.lower().replace(' ', '.')+chr(64)+'gmail.com'
 desc = 'A decorator to automatically detect mismatch when overriding a method.'
 
 setup(name='overrides',
-      version='2.0',
+      version='2.1',
       description=desc,
       author=name,
       author_email=address,
@@ -23,6 +23,7 @@ setup(name='overrides',
           'Natural Language :: English',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6'
+          'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7'
           ]
       )

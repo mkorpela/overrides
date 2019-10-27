@@ -1,5 +1,5 @@
 #
-#  Copyright 2015 Mikko Korpela
+#  Copyright 2019 Mikko Korpela
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import sys
 import dis
-__VERSION__ = '2.0'
+__VERSION__ = '2.1'
 
 if sys.version < '3':
     def itemint(x):
