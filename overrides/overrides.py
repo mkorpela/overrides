@@ -14,6 +14,7 @@
 #  limitations under the License.
 #
 
+from typing import List, Tuple
 import sys
 import dis
 __VERSION__ = '2.1'
@@ -128,7 +129,7 @@ def _get_base_class_names(frame):
     co, lasti = frame.f_code, frame.f_lasti
     code = co.co_code
 
-    extends = []
+    extends:List[Tuple[str, str]] = []
     add_last_step = False
     for (op, oparg) in op_stream(code, lasti):
         if op in dis.hasname:
@@ -147,7 +148,7 @@ def _get_base_class_names(frame):
                 add_last_step = False
 
     items = []
-    previous_item = []
+    previous_item:List[str] = []
     for t, s in extends:
         if t == 'name':
             if previous_item:
