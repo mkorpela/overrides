@@ -17,7 +17,7 @@
 from typing import List, Tuple
 import sys
 import dis
-__VERSION__ = '2.1'
+__VERSION__ = '2.2'
 
 if sys.version < '3':
     def itemint(x):
