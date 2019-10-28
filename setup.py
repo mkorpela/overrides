@@ -16,6 +16,7 @@ setup(name='overrides',
       author_email=address,
       url='https://github.com/mkorpela/overrides',
       packages=find_packages(),
+      install_requires=['typing;python_version<"3.5"'],
       license='Apache License, Version 2.0',
       keywords=['override', 'inheritence', 'OOP'],
       classifiers=[
