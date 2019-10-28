@@ -1,11 +1,11 @@
 overrides 
 ========
 
-.. image:: https://api.travis-ci.org/drorasaf/overrides.svg?branch=python3_support
-        :target: https://travis-ci.org/drorasaf/overrides
+.. image:: https://api.travis-ci.org/mkorpela/overrides.svg
+        :target: https://travis-ci.org/mkorpela/overrides
 
-.. image:: https://coveralls.io/repos/drorasaf/overrides/badge.svg?branch=python3_support
-        :target: https://coveralls.io/r/drorasaf/overrides
+.. image:: https://coveralls.io/repos/mkorpela/overrides/badge.svg
+        :target: https://coveralls.io/r/mkorpela/overrides
 
 .. image:: https://img.shields.io/pypi/v/overrides.svg
         :target: https://pypi.python.org/pypi/overrides
