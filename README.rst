@@ -38,3 +38,49 @@ Usage
         @overrides
         def method(self):
             return 1
+
+
+Enforcing usage
+
+.. code-block:: python
+
+
+    from overrides import EnforceOverrides, final, overrides
+
+    class SuperClass(EnforceOverrides):
+
+        @final
+        def method(self):
+            """This is the doc for method and will be shown in subclass method too!"""
+            return 2
+        
+        def method2(self):
+            """This is the doc for method and will be shown in subclass method too!"""
+            return 2
+        
+        def method3(self):
+            """This is the doc for method and will be shown in subclass method too!"""
+            return 2
+
+    # THIS FAILS
+    class SubClass1(SuperClass):
+
+        def method(self): # <-- overriding final method
+            return 1
+
+    
+    # THIS FAILS
+    class SubClass2(SuperClass):
+
+        def method2(self): # <-- @overrides decorator missing
+            return 1
+            
+    # THIS ONE IS OK
+    class SubClass3(SuperClass):
+
+        @overrides
+        def method2(self):
+            return 1
+
+
+
