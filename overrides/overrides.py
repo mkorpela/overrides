@@ -55,6 +55,7 @@ def overrides(method):
     :return  method with possibly added (if the method doesn't have one)
         docstring from super class
     """
+    setattr(method, "__override__", True)
     for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
         if hasattr(super_class, method.__name__):
             super_method = getattr(super_class, method.__name__)
