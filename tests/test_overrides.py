@@ -97,5 +97,6 @@ class OverridesTests(unittest.TestCase):
             self.assertEqual(genericsub.some_method(), 17)
             self.assertEqual(genericsub.some_method.__doc__, 'Generic sub class.')
 
+
 if __name__ == '__main__':
     unittest.main()
