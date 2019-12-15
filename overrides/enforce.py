@@ -9,6 +9,8 @@ class EnforceOverridesMeta(ABCMeta):
             # otherwise the error would have emerged during the parent class checking
             if name.startswith('__'):
                 continue
+            if isinstance(value, classmethod):
+                value = value.__get__(None, dict)
             is_override = getattr(value, '__override__', False)
             for base in bases:
                 base_class_method = getattr(base, name, False)
