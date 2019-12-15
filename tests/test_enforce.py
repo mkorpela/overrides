@@ -51,13 +51,11 @@ if sys.version >= '3':
                 pass
 
         def test_enforcing_when_classmethod_overriden(self):
-            return_str = "subclass_classmethod"
-
             class ClassMethodOverrider(Enforcing):
                 @classmethod
                 @overrides
                 def nonfinal_classmethod(cls):
-                    return return_str
+                    return "subclass_classmethod"
 
-            self.assertEqual(ClassMethodOverrider.nonfinal_classmethod(),
-                             return_str)
+            self.assertNotEqual(ClassMethodOverrider.nonfinal_classmethod(),
+                                Enforcing.nonfinal_classmethod())
