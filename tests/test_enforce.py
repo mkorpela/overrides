@@ -15,6 +15,10 @@ if sys.version >= '3':
 
         def nonfinal2(self):
             return "super2"
+
+        @classmethod
+        def nonfinal_classmethod(cls):
+            return "super_classmethod"
     
     class EnforceTests(unittest.TestCase):
 
@@ -46,3 +50,14 @@ if sys.version >= '3':
             except AssertionError:
                 pass
 
+        def test_enforcing_when_classmethod_overriden(self):
+            subclass_return_str = "suclass"
+
+            class ClassMethodOverrider(Enforcing):
+                @classmethod
+                @overrides
+                def nonfinal_classmethod(cls):
+                    return subclass_return_str
+
+            self.assertEqual(ClassMethodOverrider.nonfinal_classmethod(),
+                             subclass_return_str)
