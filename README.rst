@@ -1,5 +1,5 @@
 overrides 
-========
+=========
 
 .. image:: https://api.travis-ci.org/mkorpela/overrides.svg
         :target: https://travis-ci.org/mkorpela/overrides
@@ -24,6 +24,7 @@ Installation
 .. code-block:: bash
 
     $ pip install overrides
+
 Usage
 -----
 .. code-block:: python
