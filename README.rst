@@ -1,5 +1,5 @@
 overrides 
-========
+=========
 
 .. image:: https://api.travis-ci.org/mkorpela/overrides.svg
         :target: https://travis-ci.org/mkorpela/overrides
@@ -16,14 +16,15 @@ overrides
 A decorator to automatically detect mismatch when overriding a method.
 See http://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-overriding-a-method
 
-All checks are done when a class or a method is created and *not* when a method is executed or an instance of a class is created.
-This means that performace implications are minimal.
+All checks are done when a class or a method is created and *not* when a method is executed or
+an instance of a class is created. This means that performace implications are minimal.
 
 Installation
 ------------
 .. code-block:: bash
 
     $ pip install overrides
+
 Usage
 -----
 .. code-block:: python
