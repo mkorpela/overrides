@@ -16,10 +16,14 @@ if sys.version >= '3':
         def nonfinal2(self):
             return "super2"
 
+        @property
+        def nonfinal_property(self):
+            return "super_property"
+
         @classmethod
         def nonfinal_classmethod(cls):
             return "super_classmethod"
-    
+
     class EnforceTests(unittest.TestCase):
 
         def test_enforcing_when_all_ok(self):
@@ -49,6 +53,16 @@ if sys.version >= '3':
                 raise RuntimeError('Should not go here')
             except AssertionError:
                 pass
+
+        def test_enforcing_when_property_overriden(self):
+            class PropertyOverrider(Enforcing):
+                @property
+                @overrides
+                def nonfinal_property(self):
+                    return "subclass_property"
+
+            self.assertNotEqual(PropertyOverrider.nonfinal_property,
+                                Enforcing.nonfinal_property)
 
         def test_enforcing_when_classmethod_overriden(self):
             class ClassMethodOverrider(Enforcing):
