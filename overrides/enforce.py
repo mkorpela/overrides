@@ -13,13 +13,13 @@ class EnforceOverridesMeta(ABCMeta):
             is_override = getattr(value, '__override__', False)
             for base in bases:
                 base_class_method = getattr(base, name, False)
-                if not base_class_method:
+                if not base_class_method or not callable(base_class_method):
                     continue
                 assert is_override, \
                     'Method %s overrides but does not have @overrides decorator' % (name)
                 # `__finalized__` is added by `@final` decorator
                 assert not getattr(base_class_method, '__finalized__', False), \
-                    'Method %s is finalized in %s, it cannot be overridden' % (base_class_method, base) 
+                    'Method %s is finalized in %s, it cannot be overridden' % (base_class_method, base)
         return cls
 
     @staticmethod

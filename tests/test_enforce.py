@@ -6,6 +6,8 @@ if sys.version >= '3':
 
     class Enforcing(EnforceOverrides):
 
+        classVariableIsOk = "OK?"
+
         @final
         def finality(self):
             return "final"
@@ -28,6 +30,7 @@ if sys.version >= '3':
 
         def test_enforcing_when_all_ok(self):
             class Subclazz(Enforcing):
+                classVariableIsOk = "OK!"
                 @overrides
                 def nonfinal1(self):
                     return 1
@@ -35,7 +38,8 @@ if sys.version >= '3':
             self.assertEqual(sc.finality(), "final")
             self.assertEqual(sc.nonfinal1(), 1)
             self.assertEqual(sc.nonfinal2(), "super2")
-    
+            self.assertEqual(sc.classVariableIsOk, "OK!")
+
         def tests_enforcing_when_finality_broken(self):
             try:
                 class BrokesFinality(Enforcing):
@@ -44,7 +48,7 @@ if sys.version >= '3':
                 raise RuntimeError('Should not go here')
             except AssertionError:
                 pass
-    
+
         def test_enforcing_when_none_explicit_override(self):
             try:
                 class Overrider(Enforcing):
