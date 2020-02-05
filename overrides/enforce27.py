@@ -3,7 +3,8 @@ from abc import ABCMeta
 
 class EnforceOverridesMeta(ABCMeta):
     def __new__(mcls, name, bases, namespace, **kwargs):
-        cls = super(mcls, mcls).__new__(mcls, name, bases, namespace, **kwargs)
+        cls = super(EnforceOverridesMeta, mcls).__new__(mcls, name, bases, namespace, **kwargs)
+        cls_name = name
         for name, value in namespace.items():
             # Actually checking the direct parent should be enough,
             # otherwise the error would have emerged during the parent class checking
@@ -15,10 +16,12 @@ class EnforceOverridesMeta(ABCMeta):
                 if not base_class_method:
                     continue
                 assert is_override, \
-                    'Method %s overrides but does not have @overrides decorator' % (name)
+                    '%s method %s overrides but does not have @overrides decorator' % (
+                        cls_name, name)
                 # `__finalized__` is added by `@final` decorator
                 assert not getattr(base_class_method, '__finalized__', False), \
-                    'Method %s is finalized in %s, it cannot be overridden' % (base_class_method, base)
+                    '%s method %s is finalized in %s, it cannot be overridden' % (
+                        cls_name, base_class_method, base)
         return cls
 
 class EnforceOverrides(object):
