@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-from setuptools import find_packages
+from setuptools import find_packages # type: ignore
 from os.path import abspath, join, dirname
 
 name = 'Mikko Korpela'
@@ -23,6 +23,7 @@ setup(name='overrides',
       author_email=address,
       url='https://github.com/mkorpela/overrides',
       packages=find_packages(),
+      install_requires=['typing;python_version<"3.5"'],
       license='Apache License, Version 2.0',
       keywords=['override', 'inheritence', 'OOP'],
       classifiers=[
