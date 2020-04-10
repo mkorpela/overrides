@@ -1,11 +1,27 @@
 from abc import ABCMeta
 
 
+def _inherit_docstring_2(cls, name, member):
+    # Proved parent docstring if it's missing here
+    if not getattr(member, '__doc__'):
+        for base in cls.__mro__[1:]:
+            try:
+                member.__doc__ = getattr(base, name).__doc__
+                break
+            except AttributeError:
+                pass
+            except TypeError:
+                break  # this can happen e.g. for @property entries
+    # <https://github.com/sphinx-doc/sphinx/issues/3140>
+
+
 class EnforceOverridesMeta(ABCMeta):
     def __new__(mcls, name, bases, namespace, **kwargs):
         cls = super(EnforceOverridesMeta, mcls).__new__(mcls, name, bases, namespace, **kwargs)
         cls_name = name
         for name, value in namespace.items():
+            _inherit_docstring_2(cls, name, value)
+
             # Actually checking the direct parent should be enough,
             # otherwise the error would have emerged during the parent class checking
             if name.startswith('__'):

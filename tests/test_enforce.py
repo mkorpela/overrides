@@ -2,6 +2,7 @@ import unittest
 from overrides import overrides,final,EnforceOverrides
 
 class Enforcing(EnforceOverrides):
+    "BASE class docstring"
 
     classVariableIsOk = "OK?"
 
@@ -10,9 +11,11 @@ class Enforcing(EnforceOverrides):
         return "final"
 
     def nonfinal1(self):
+        "BASE nonfinal1 docstring"
         return "super1"
 
     def nonfinal2(self):
+        "BASE nonfinal2 docstring"
         return "super2"
 
     @property
@@ -36,6 +39,22 @@ class EnforceTests(unittest.TestCase):
         self.assertEqual(sc.nonfinal1(), 1)
         self.assertEqual(sc.nonfinal2(), "super2")
         self.assertEqual(sc.classVariableIsOk, "OK!")
+
+
+    def test_docstring_inheritance(self):
+        class Subclazz(Enforcing):
+            @overrides
+            def nonfinal1(self):
+                "SUB nonfinal1 docstring"
+                return 1
+            @overrides
+            def nonfinal2(self):
+                return 1
+        sc = Subclazz()
+#        self.assertEqual(sc.__doc__, "BASE class docstring")  # does not (yet?) work for class doc
+        self.assertEqual(sc.nonfinal1.__doc__, "SUB nonfinal1 docstring")
+        self.assertEqual(sc.nonfinal2.__doc__, "BASE nonfinal2 docstring")
+
 
     def tests_enforcing_when_finality_broken(self):
         try:
