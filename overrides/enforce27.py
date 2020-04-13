@@ -1,8 +1,8 @@
 from abc import ABCMeta
 
 
-def _inherit_docstring_2(cls, name, member):
-    # Proved parent docstring if it's missing here
+def _inherit_docstring(cls, name, member):
+    # Provide parent docstring if it's missing here
     if not getattr(member, '__doc__'):
         for base in cls.__mro__[1:]:
             try:
@@ -20,7 +20,7 @@ class EnforceOverridesMeta(ABCMeta):
         cls = super(EnforceOverridesMeta, mcls).__new__(mcls, name, bases, namespace, **kwargs)
         cls_name = name
         for name, value in namespace.items():
-            _inherit_docstring_2(cls, name, value)
+            _inherit_docstring(cls, name, value)
 
             # Actually checking the direct parent should be enough,
             # otherwise the error would have emerged during the parent class checking
