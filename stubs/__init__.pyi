@@ -1,6 +1,0 @@
-from typing import Any, Callable, TypeVar
-
-_FuncT = TypeVar('_FuncT', bound=Callable[..., Any])
-
-def final(method: _FuncT) -> _FuncT: ...
-def overrides(method: _FuncT) -> _FuncT: ...

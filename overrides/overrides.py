@@ -16,7 +16,7 @@
 
 import sys
 import dis
-from typing import List, Tuple
+from typing import Any, Callable, List, Tuple, TypeVar
 __VERSION__ = '2.8.0'
 
 if sys.version < '3':
@@ -28,7 +28,10 @@ else:
     long = int
 
 
-def overrides(method):
+_WrappedMethod = TypeVar('WrappedMethod', bound=Callable[..., Any])
+
+
+def overrides(method: _WrappedMethod) -> _WrappedMethod:
     """Decorator to indicate that the decorated method overrides a method in
     superclass.
     The decorator code is executed while loading class. Using this method
