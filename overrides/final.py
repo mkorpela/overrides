@@ -13,11 +13,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+from typing import Any, Callable, TypeVar
 
 __VERSION__ = '0.1'
 
 
-def final(method):
+_WrappedMethod = TypeVar('WrappedMethod', bound=Callable[..., Any])
+
+
+def final(method: _WrappedMethod) -> _WrappedMethod:
     """Decorator to indicate that the decorated method is finalized and cannot be overridden.
     The decorator code is executed while loading class. Using this method
     should have minimal runtime performance implications.
