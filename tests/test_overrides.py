@@ -1,25 +1,25 @@
 import unittest
-import sys
 from overrides import overrides
 import test_somepackage
 
-if sys.version >= '3.5':
-    from typing import Generic, TypeVar
 
-    TObject = TypeVar("TObject", bound="Foo")
+from typing import Generic, TypeVar
 
-
-    class SubClassOfGeneric(Generic[TObject]):
-        def some_method(self):
-            """Generic sub class."""
-            pass
+TObject = TypeVar("TObject", bound="Foo")
 
 
-    class SubSubClassOfGeneric(SubClassOfGeneric["SubSubClassOfGeneric"]):
+class SubClassOfGeneric(Generic[TObject]):
+    def some_method(self):
+        """Generic sub class."""
+        pass
 
-        @overrides
-        def some_method(self):
-            return 17
+
+class SubSubClassOfGeneric(SubClassOfGeneric["SubSubClassOfGeneric"]):
+
+    @overrides
+    def some_method(self):
+        return 17
+
 
 class SuperClass(object):
 
@@ -60,6 +60,7 @@ class SubclassOfInt(int):
     def __str__(self):
         return "subclass of int"
 
+
 class OverridesTests(unittest.TestCase):
 
     def test_overrides_passes_for_same_package_superclass(self):
@@ -91,11 +92,11 @@ class OverridesTests(unittest.TestCase):
         x = SubclassOfInt(10)
         self.assertEqual(str(x), 'subclass of int')
 
-    if sys.version >= '3.5':
-        def test_overrides_method_from_generic_subclass(self):
-            genericsub = SubSubClassOfGeneric()
-            self.assertEqual(genericsub.some_method(), 17)
-            self.assertEqual(genericsub.some_method.__doc__, 'Generic sub class.')
+
+    def test_overrides_method_from_generic_subclass(self):
+        genericsub = SubSubClassOfGeneric()
+        self.assertEqual(genericsub.some_method(), 17)
+        self.assertEqual(genericsub.some_method.__doc__, 'Generic sub class.')
 
 
 if __name__ == '__main__':
