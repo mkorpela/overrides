@@ -16,19 +16,12 @@
 
 import sys
 import dis
-from typing import Any, Callable, List, Tuple, TypeVar
+from typing import List, Tuple, TypeVar
+from types import FunctionType
 __VERSION__ = '2.8.0'
 
-if sys.version < '3':
-    def itemint(x):
-        return ord(x)
-else:
-    def itemint(x):
-        return x
-    long = int
 
-
-_WrappedMethod = TypeVar('WrappedMethod', bound=Callable[..., Any])
+_WrappedMethod = TypeVar('_WrappedMethod', bound=FunctionType)
 
 
 def overrides(method: _WrappedMethod) -> _WrappedMethod:
@@ -79,53 +72,25 @@ def _get_base_classes(frame, namespace):
     return [_get_base_class(class_name_components, namespace) for
             class_name_components in _get_base_class_names(frame)]
 
-if sys.version < '3.6':
-    def op_stream(code, max):
-        """Generator function: convert Python bytecode into a sequence of
-        opcode-argument pairs."""
-        i = [0]
+def op_stream(code, max):
+    """Generator function: convert Python bytecode into a sequence of
+    opcode-argument pairs."""
+    i = [0]
+    def next():
+        val = code[i[0]]
+        i[0] += 1
+        return val
 
-        def next():
-            val = itemint(code[i[0]])
-            i[0] += 1
-            return val
-
-        ext_arg = 0
-        while i[0] <= max:
-            op = next()
-            if op > dis.HAVE_ARGUMENT:
-                arg = next() + (next() << 8)
-            else:
-                assert ext_arg == 0
-                arg = 0  # unused
-
-            if op == dis.EXTENDED_ARG:
-                ext_arg += arg
-                ext_arg <<= 16
-                continue
-            else:
-                yield (op, arg + ext_arg)
-                ext_arg = 0
-else:
-    def op_stream(code, max):
-        """Generator function: convert Python bytecode into a sequence of
-        opcode-argument pairs."""
-        i = [0]
-        def next():
-            val = itemint(code[i[0]])
-            i[0] += 1
-            return val
-
-        ext_arg = 0
-        while i[0] <= max:
-            op, arg = next(), next()
-            if op == dis.EXTENDED_ARG:
-                ext_arg += arg
-                ext_arg <<= 8
-                continue
-            else:
-                yield (op, arg + ext_arg)
-                ext_arg = 0
+    ext_arg = 0
+    while i[0] <= max:
+        op, arg = next(), next()
+        if op == dis.EXTENDED_ARG:
+            ext_arg += arg
+            ext_arg <<= 8
+            continue
+        else:
+            yield (op, arg + ext_arg)
+            ext_arg = 0
 
 
 def _get_base_class_names(frame):

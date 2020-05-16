@@ -13,12 +13,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from typing import Any, Callable, TypeVar
+from typing import TypeVar
+from types import FunctionType
 
 __VERSION__ = '0.1'
 
 
-_WrappedMethod = TypeVar('WrappedMethod', bound=Callable[..., Any])
+_WrappedMethod = TypeVar('_WrappedMethod', bound=FunctionType)
 
 
 def final(method: _WrappedMethod) -> _WrappedMethod:
