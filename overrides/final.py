@@ -16,10 +16,10 @@
 from typing import TypeVar
 from types import FunctionType
 
-__VERSION__ = '0.1'
+__VERSION__ = "0.1"
 
 
-_WrappedMethod = TypeVar('_WrappedMethod', bound=FunctionType)
+_WrappedMethod = TypeVar("_WrappedMethod", bound=FunctionType)
 
 
 def final(method: _WrappedMethod) -> _WrappedMethod:
@@ -46,4 +46,3 @@ def final(method: _WrappedMethod) -> _WrappedMethod:
     """
     setattr(method, "__finalized__", True)
     return method
-

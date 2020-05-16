@@ -18,10 +18,11 @@ import sys
 import dis
 from typing import List, Tuple, TypeVar
 from types import FunctionType
-__VERSION__ = '2.8.0'
+
+__VERSION__ = "2.8.0"
 
 
-_WrappedMethod = TypeVar('_WrappedMethod', bound=FunctionType)
+_WrappedMethod = TypeVar("_WrappedMethod", bound=FunctionType)
 
 
 def overrides(method: _WrappedMethod) -> _WrappedMethod:
@@ -59,23 +60,25 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
             if hasattr(super_method, "__finalized__"):
                 finalized = getattr(super_method, "__finalized__")
                 if finalized:
-                    raise AssertionError('Method "%s" is finalized' %
-                                         method.__name__)
+                    raise AssertionError('Method "%s" is finalized' % method.__name__)
             if not method.__doc__:
                 method.__doc__ = super_method.__doc__
             return method
-    raise AssertionError('No super class method found for "%s"' %
-                         method.__name__)
+    raise AssertionError('No super class method found for "%s"' % method.__name__)
 
 
 def _get_base_classes(frame, namespace):
-    return [_get_base_class(class_name_components, namespace) for
-            class_name_components in _get_base_class_names(frame)]
+    return [
+        _get_base_class(class_name_components, namespace)
+        for class_name_components in _get_base_class_names(frame)
+    ]
+
 
 def op_stream(code, max):
     """Generator function: convert Python bytecode into a sequence of
     opcode-argument pairs."""
     i = [0]
+
     def next():
         val = code[i[0]]
         i[0] += 1
@@ -98,28 +101,28 @@ def _get_base_class_names(frame):
     co, lasti = frame.f_code, frame.f_lasti
     code = co.co_code
 
-    extends = [] # type: List[Tuple[str, str]]
+    extends = []  # type: List[Tuple[str, str]]
     add_last_step = False
     for (op, oparg) in op_stream(code, lasti):
         if op in dis.hasname:
             if not add_last_step:
                 extends = []
-            if dis.opname[op] == 'LOAD_NAME':
-                extends.append(('name', co.co_names[oparg]))
+            if dis.opname[op] == "LOAD_NAME":
+                extends.append(("name", co.co_names[oparg]))
                 add_last_step = True
-            elif dis.opname[op] == 'LOAD_ATTR':
-                extends.append(('attr', co.co_names[oparg]))
+            elif dis.opname[op] == "LOAD_ATTR":
+                extends.append(("attr", co.co_names[oparg]))
                 add_last_step = True
-            elif dis.opname[op] == 'LOAD_GLOBAL':
-                extends.append(('name', co.co_names[oparg]))
+            elif dis.opname[op] == "LOAD_GLOBAL":
+                extends.append(("name", co.co_names[oparg]))
                 add_last_step = True
             else:
                 add_last_step = False
 
     items = []
-    previous_item = [] # type: List[str]
+    previous_item = []  # type: List[str]
     for t, s in extends:
-        if t == 'name':
+        if t == "name":
             if previous_item:
                 items.append(previous_item)
             previous_item = [s]
