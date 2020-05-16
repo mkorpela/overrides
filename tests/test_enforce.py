@@ -41,7 +41,6 @@ class EnforceTests(unittest.TestCase):
         sc = Subclazz()
         self.assertEqual(sc.finality(), "final")
         self.assertEqual(sc.nonfinal1(1), 2)
-        e = sc.nonfinal1(param=1)
         self.assertEqual(sc.nonfinal2(), "super2")
         self.assertEqual(sc.classVariableIsOk, "OK!")
 
