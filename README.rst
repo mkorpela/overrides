@@ -17,7 +17,11 @@ A decorator to automatically detect mismatch when overriding a method.
 See http://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-overriding-a-method
 
 All checks are done when a class or a method is created and *not* when a method is executed or
-an instance of a class is created. This means that performace implications are minimal.
+an instance of a class is created. This means that performance implications are minimal.
+
+*Note:*
+Version 2.8.0 is the last one that supports Python 2.7.
+Versions after that work with Python >= 3.6.
 
 Installation
 ------------
