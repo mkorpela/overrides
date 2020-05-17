@@ -23,6 +23,18 @@ an instance of a class is created. This means that performance implications are 
 Version 2.8.0 is the last one that supports Python 2.7.
 Versions after that work with Python >= 3.6.
 
+Why explicit overrides?
+-----------------------
+
+Overrides without explicit indicator for them are weak. The relation can be staticly checked only against current codebase but
+this leaves room for problems that happen during evolution of a codebase.
+
+1. (create) Accidental overriding when adding a method to superclass.
+2. (modify) Rename of a superclass method without subclass method rename.
+3. (delete) Deleting of a superclass method without detecting in subclass that method is not anymore overriding anything.
+
+These might happen for example when overriding a method in a module that does not live in your codebase, or when merging changes done by someone else to the codebase without having access to your subclass.
+
 Installation
 ------------
 .. code-block:: bash
