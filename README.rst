@@ -26,7 +26,7 @@ Versions after that work with Python >= 3.6.
 Why explicit overrides?
 -----------------------
 
-Overrides without explicit indicator for them are weak. The relation can be staticly checked only against current codebase but
+Overrides without explicit indicator for them are weak. The relation can be statically checked only against current codebase but
 this leaves room for problems that happen during evolution of a codebase.
 
 1. (create) Accidental overriding when adding a method to superclass.
