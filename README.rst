@@ -29,9 +29,9 @@ Why explicit overrides?
 Overrides without explicit indicator for them are weak. The relation can be statically checked only against current codebase but
 this leaves room for problems that happen during evolution of a codebase.
 
-1. (create) Accidental overriding in a subclass when a method to superclass is added.
-2. (modify) Rename of a superclass method without subclass method rename.
-3. (delete) Deleting of a superclass method without detecting in subclass that the method is not anymore overriding anything.
+1. (create) Accidental overriding in a subclass when a method to a superclass is added (or vice versa).
+2. (modify) Rename of a superclass method without subclass method rename (or vice versa).
+3. (delete) Deleting of a superclass method without detecting in subclass that the method is not anymore overriding anything (or vice versa).
 
 These might happen for example when overriding a method in a module that does not live in your codebase, or when merging changes done by someone else to the codebase without having access to your subclass.
 
