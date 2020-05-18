@@ -98,6 +98,7 @@ Enforcing usage
         def method2(self): # <-- @overrides decorator missing
             return 1
             
+            
     # THIS ONE IS OK
     class SubClass3(SuperClass):
 
