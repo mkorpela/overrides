@@ -53,6 +53,7 @@ Usage
             """This is the doc for a method and will be shown in subclass method too!"""
             return 2
 
+
     class SubClass(SuperClass):
 
         @overrides
@@ -82,6 +83,7 @@ Enforcing usage
         def method3(self):
             """This is the doc for a method and will be shown in subclass method too!"""
             return 2
+
 
     # THIS FAILS
     class SubClass1(SuperClass):
