@@ -22,15 +22,17 @@ class Enforcing(EnforceOverrides):
     def nonfinal_property(self):
         return "super_property"
 
+    @staticmethod
+    def nonfinal_staticmethod():
+        return "super_staticmethod"
+
     @classmethod
     def nonfinal_classmethod(cls):
         return "super_classmethod"
 
 
 class EnforceTests(unittest.TestCase):
-
     def test_enforcing_when_all_ok(self):
-
         class Subclazz(Enforcing):
             classVariableIsOk = "OK!"
 
@@ -71,6 +73,18 @@ class EnforceTests(unittest.TestCase):
 
         self.assertNotEqual(PropertyOverrider.nonfinal_property,
                             Enforcing.nonfinal_property)
+
+    def test_enforcing_when_staticmethod_overriden(self):
+        class StaticMethodOverrider(Enforcing):
+            @staticmethod
+            @overrides
+            def nonfinal_staticmethod():
+                return "subclass_staticmethod"
+
+        self.assertNotEqual(
+            StaticMethodOverrider.nonfinal_staticmethod(),
+            Enforcing.nonfinal_staticmethod(),
+        )
 
     def test_enforcing_when_classmethod_overriden(self):
         class ClassMethodOverrider(Enforcing):
