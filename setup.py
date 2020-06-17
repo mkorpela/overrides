@@ -16,7 +16,7 @@ with open(join(CURDIR, 'README.rst')) as f:
     LONG_DESCRIPTION = f.read()
 
 setup(name='overrides',
-      version='3.0.0',
+      version='3.1.0',
       description=desc,
       long_description=LONG_DESCRIPTION,
       author=name,
@@ -30,6 +30,7 @@ setup(name='overrides',
           'Intended Audience :: Developers',
           'Natural Language :: English',
           'Programming Language :: Python :: 3.6',
-          'Programming Language :: Python :: 3.7'
+          'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8'
           ]
       )
