@@ -1,4 +1,4 @@
-overrides 
+overrides
 =========
 
 .. image:: https://api.travis-ci.org/mkorpela/overrides.svg
@@ -46,7 +46,7 @@ Usage
 
     from overrides import overrides
 
-    class SuperClass(object):
+    class SuperClass:
 
         def method(self):
             """This is the doc for a method and will be shown in subclass method too!"""
@@ -74,12 +74,13 @@ Enforcing usage
         def method(self):
             """This is the doc for a method and will be shown in subclass method too!"""
             return 2
-        
+
         def method2(self):
             """This is the doc for a method and will be shown in subclass method too!"""
             return 2
-        
-        def method3(self):
+
+        @staticmethod
+        def method3():
             """This is the doc for a method and will be shown in subclass method too!"""
             return 2
 
@@ -90,14 +91,14 @@ Enforcing usage
         def method(self): # <-- overriding a final method
             return 1
 
-    
+
     # THIS FAILS
     class SubClass2(SuperClass):
 
         def method2(self): # <-- @overrides decorator missing
             return 1
-            
-            
+
+
     # THIS ONE IS OK
     class SubClass3(SuperClass):
 
@@ -106,4 +107,10 @@ Enforcing usage
             return 1
 
 
+    # ENSURE THAT @classmethod AND @staticmethod ARE PLACED AT THE TOP
+    class SubClass4(SuperClass):
 
+        @staticmethod
+        @overrides
+        def method3():
+            return 1
