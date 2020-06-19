@@ -14,10 +14,10 @@
 #  limitations under the License.
 #
 
-import sys
 import dis
-from typing import List, Tuple, TypeVar
+import sys
 from types import FunctionType
+from typing import List, Tuple, TypeVar
 
 __VERSION__ = "3.1.0"
 
@@ -60,11 +60,11 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
             if hasattr(super_method, "__finalized__"):
                 finalized = getattr(super_method, "__finalized__")
                 if finalized:
-                    raise AssertionError('Method "%s" is finalized' % method.__name__)
+                    raise AssertionError(f'Method "method.__name__" is finalized')
             if not method.__doc__:
                 method.__doc__ = super_method.__doc__
             return method
-    raise AssertionError('No super class method found for "%s"' % method.__name__)
+    raise AssertionError(f'No super class method found for "{method.__name__}"')
 
 
 def _get_base_classes(frame, namespace):

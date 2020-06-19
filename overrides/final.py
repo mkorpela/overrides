@@ -13,8 +13,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from typing import TypeVar
 from types import FunctionType
+from typing import TypeVar
 
 __VERSION__ = "0.1"
 

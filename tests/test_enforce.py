@@ -1,7 +1,7 @@
+import unittest
 from typing import Dict
 
-import unittest
-from overrides import overrides,final,EnforceOverrides
+from overrides import EnforceOverrides, final, overrides
 
 
 class Enforcing(EnforceOverrides):
@@ -48,19 +48,23 @@ class EnforceTests(unittest.TestCase):
 
     def tests_enforcing_when_finality_broken(self):
         try:
+
             class BrokesFinality(Enforcing):
                 def finality(self):
                     return "NEVER HERE"
-            raise RuntimeError('Should not go here')
+
+            raise RuntimeError("Should not go here")
         except AssertionError:
             pass
 
     def test_enforcing_when_none_explicit_override(self):
         try:
+
             class Overrider(Enforcing):
                 def nonfinal2(self):
                     return "NEVER HERE EITHER"
-            raise RuntimeError('Should not go here')
+
+            raise RuntimeError("Should not go here")
         except AssertionError:
             pass
 
@@ -71,8 +75,7 @@ class EnforceTests(unittest.TestCase):
             def nonfinal_property(self):
                 return "subclass_property"
 
-        self.assertNotEqual(PropertyOverrider.nonfinal_property,
-                            Enforcing.nonfinal_property)
+        self.assertNotEqual(PropertyOverrider.nonfinal_property, Enforcing.nonfinal_property)
 
     def test_enforcing_when_staticmethod_overriden(self):
         class StaticMethodOverrider(Enforcing):
@@ -82,8 +85,7 @@ class EnforceTests(unittest.TestCase):
                 return "subclass_staticmethod"
 
         self.assertNotEqual(
-            StaticMethodOverrider.nonfinal_staticmethod(),
-            Enforcing.nonfinal_staticmethod(),
+            StaticMethodOverrider.nonfinal_staticmethod(), Enforcing.nonfinal_staticmethod(),
         )
 
     def test_enforcing_when_classmethod_overriden(self):
@@ -93,5 +95,6 @@ class EnforceTests(unittest.TestCase):
             def nonfinal_classmethod(cls):
                 return "subclass_classmethod"
 
-        self.assertNotEqual(ClassMethodOverrider.nonfinal_classmethod(),
-                            Enforcing.nonfinal_classmethod())
+        self.assertNotEqual(
+            ClassMethodOverrider.nonfinal_classmethod(), Enforcing.nonfinal_classmethod()
+        )

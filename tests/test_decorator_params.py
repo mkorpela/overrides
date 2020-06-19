@@ -1,4 +1,5 @@
 from typing import Callable, Type
+
 from overrides import overrides
 
 
@@ -10,6 +11,7 @@ class SuperClass:
 def my_decorator(name: str) -> Callable:
     def func(cls: Type) -> Type:
         return cls
+
     return func
 
 

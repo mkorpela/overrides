@@ -17,12 +17,11 @@ class EnforceOverridesMeta(ABCMeta):
                     continue
                 assert (
                     is_override
-                ), "Method %s overrides but does not have @overrides decorator" % (name)
+                ), f"Method {name} overrides but does not have @overrides decorator"
                 # `__finalized__` is added by `@final` decorator
-                assert not getattr(base_class_method, "__finalized__", False), (
-                    "Method %s is finalized in %s, it cannot be overridden"
-                    % (base_class_method, base)
-                )
+                assert not getattr(
+                    base_class_method, "__finalized__", False
+                ), f"Method {base_class_method} is finalized in {base}, it cannot be overridden"
         return cls
 
     @staticmethod
