@@ -35,5 +35,7 @@ class EnforceOverridesMeta(ABCMeta):
 
 
 class EnforceOverrides(metaclass=EnforceOverridesMeta):
-    "Use this as the parent class for your custom classes"
-    pass
+    """ Use this as the parent class for your custom classes """
+
+    def __init__(self) -> None:
+        super().__init__()
