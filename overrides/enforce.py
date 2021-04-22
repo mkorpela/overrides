@@ -1,4 +1,69 @@
 from abc import ABCMeta
+import inspect
+from typing import Callable
+
+import typing_utils
+
+
+def is_compatible(
+    x: Callable,
+    y: Callable,
+) -> None:
+    """Verify that the signature of `y` is compatible with the signature of `x`.
+
+    Ensures that any call to `x` will work on `y` by checking the following criteria:
+
+    1. The return type of `y` is a subtype of the return type of `x`.
+    2. All parameters of `x` are present in `y`.
+    3. All positional parameters of `x` appear in the same order in `y`.
+    4. All parameters of `x` are a subtype of the corresponding parameters of `y`.
+    5. All parameters of `y` are present in `x`, unless `x` has a `*args` or `**kwargs` parameter.
+
+    :param x: Function to check compatibility with.
+    :param y: Function to check compatibility of.
+    """
+    x_sig = inspect.signature(x)
+    y_sig = inspect.signature(y)
+
+    # Verify that the return type of `y` is a subtype of `x`.
+    if x_sig.return_annotation != inspect.Signature.empty \
+        and y_sig.return_annotation != inspect.Signature.empty \
+        and not typing_utils.issubtype(y_sig.return_annotation, x_sig.return_annotation):
+        raise TypeError(f"`{y_sig.return_annotation}` is not a `{x_sig.return_annotation}`.")
+
+    # Verify that all parameters in `x` are specified in `y` and that their types are compatible.
+    x_var_args = False
+    x_var_kwargs = False
+
+    for x_index, (name, x_param) in enumerate(x_sig.parameters.items()):
+        if x_param.kind == inspect.Parameter.VAR_POSITIONAL:
+            x_var_args = True
+        elif x_param.kind == inspect.Parameter.VAR_KEYWORD:
+            x_var_kwargs = True
+        elif name not in y_sig.parameters:
+            raise TypeError(f"`{name}` is not present.")
+        else:
+            y_index = list(y_sig.parameters.keys()).index(name)
+            y_param = y_sig.parameters[name]
+            
+            if x_param.kind != y_param.kind:
+                raise TypeError(f"`{name}` is not `{x_param.kind.description}`")
+            elif x_param.kind != inspect.Parameter.KEYWORD_ONLY and x_index != y_index:
+                raise TypeError(f"`{name}` is not parameter `{x_index}`")
+            elif x_param.annotation != inspect.Parameter.empty \
+                and y_param.annotation != inspect.Parameter.empty \
+                and not typing_utils.issubtype(x_param.annotation, y_param.annotation):
+                raise TypeError(f"`{name} must be a supertype of `{x_param.annotation}`")
+
+    # Verify that no parameters are specified in `y` that are not specified in `x`.
+    for name, y_param in y_sig.parameters.items():
+        if name not in x_sig.parameters \
+            and not (y_param.kind == inspect.Parameter.KEYWORD_ONLY and x_var_kwargs) \
+            and not (y_param.kind == inspect.Parameter.VAR_KEYWORD and x_var_kwargs) \
+            and not (y_param.kind == inspect.Parameter.VAR_POSITIONAL and x_var_args) \
+            and not (y_param.kind == inspect.Parameter.POSITIONAL_ONLY and x_var_args) \
+            and not (y_param.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD and x_var_args):
+            raise TypeError(f"`{name}` is not a valid parameter.")
 
 
 class EnforceOverridesMeta(ABCMeta):
@@ -23,6 +88,7 @@ class EnforceOverridesMeta(ABCMeta):
                     "Method %s is finalized in %s, it cannot be overridden"
                     % (base_class_method, base)
                 )
+                is_compatible(base_class_method, value)
         return cls
 
     @staticmethod

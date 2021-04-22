@@ -1,7 +1,8 @@
 from typing import Dict
 
 import unittest
-from overrides import overrides,final,EnforceOverrides
+from overrides import overrides, final, EnforceOverrides
+from overrides.enforce import is_compatible
 
 
 class Enforcing(EnforceOverrides):
@@ -37,7 +38,7 @@ class EnforceTests(unittest.TestCase):
             classVariableIsOk = "OK!"
 
             @overrides
-            def nonfinal1(self, param: int) -> int:
+            def nonfinal1(self, param: int) -> str:
                 return 2
 
         sc = Subclazz()
@@ -46,7 +47,7 @@ class EnforceTests(unittest.TestCase):
         self.assertEqual(sc.nonfinal2(), "super2")
         self.assertEqual(sc.classVariableIsOk, "OK!")
 
-    def tests_enforcing_when_finality_broken(self):
+    def test_enforcing_when_finality_broken(self):
         try:
             class BrokesFinality(Enforcing):
                 def finality(self):
@@ -74,6 +75,13 @@ class EnforceTests(unittest.TestCase):
         self.assertNotEqual(PropertyOverrider.nonfinal_property,
                             Enforcing.nonfinal_property)
 
+    def test_enforcing_when_incompatible(self):
+        with self.assertRaises(TypeError):
+            class Incompatible(Enforcing):
+                @overrides
+                def nonfinal1(self, param: str):
+                    pass
+
     def test_enforcing_when_staticmethod_overriden(self):
         class StaticMethodOverrider(Enforcing):
             @staticmethod
@@ -95,3 +103,62 @@ class EnforceTests(unittest.TestCase):
 
         self.assertNotEqual(ClassMethodOverrider.nonfinal_classmethod(),
                             Enforcing.nonfinal_classmethod())
+
+    def test_is_compatible_when_compatible(self):
+        def foo(x, /, y: str, *args, z: int, **kwargs) -> object:
+            pass
+
+        def bar(x, /, y: object, a: float, *, b: bytes, z: int, **kwargs) -> str:
+            pass
+
+        is_compatible(foo, bar)
+
+    def test_is_compatible_when_return_types_are_incompatible(self):
+        def foo(x) -> int:
+            pass
+
+        def bar(x) -> str:
+            pass
+
+        with self.assertRaises(TypeError):
+            is_compatible(foo, bar)
+    
+    def test_is_compatible_when_parameter_positions_are_incompatible(self):
+        def foo(x, y):
+            pass
+
+        def bar(y, x):
+            pass
+
+        with self.assertRaises(TypeError):
+            is_compatible(foo, bar)
+    
+    def test_is_compatible_when_parameter_types_are_incompatible(self):
+        def foo(x: object):
+            pass
+
+        def bar(y: str):
+            pass
+
+        with self.assertRaises(TypeError):
+            is_compatible(foo, bar)
+
+    def test_is_compatible_when_parameter_kinds_are_incompatible(self):
+        def foo(x, *, y):
+            pass
+
+        def bar(x, y):
+            pass
+
+        with self.assertRaises(TypeError):
+            is_compatible(foo, bar)
+
+    def test_is_compatible_when_parameter_lists_are_incompatible(self):
+        def foo(x):
+            pass
+
+        def bar(x, y):
+            pass
+
+        with self.assertRaises(TypeError):
+            is_compatible(foo, bar)
