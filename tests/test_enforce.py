@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union, Optional
 
 import unittest
 from overrides import overrides, final, EnforceOverrides
@@ -163,3 +163,41 @@ class EnforceTests(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             ensure_compatible(sup, sub)
+
+    def test_ensure_compatible_when_missing_arg(self):
+        def sup():
+            pass
+
+        def sub(x):
+            pass
+
+        with self.assertRaises(TypeError):
+            ensure_compatible(sup, sub)
+
+    def test_ensure_compatible_when_additional_arg(self):
+        def sup(x):
+            pass
+
+        def sub():
+            pass
+
+        with self.assertRaises(TypeError):
+            ensure_compatible(sup, sub)
+
+    def test_union_compatible(self):
+        def sup(x:int):
+            pass
+        def sub(x:Union[int, str]):
+            pass
+        ensure_compatible(sup, sub)
+        with self.assertRaises(TypeError):
+            ensure_compatible(sub, sup)
+
+    def test_generic_sub(self):
+        def better_typed_method(x:int, y:Optional[str], z:float = 3.0):
+            pass
+        def generic_method(*args, **kwargs):
+            pass
+        ensure_compatible(better_typed_method, generic_method)
+        with self.assertRaises(TypeError):
+            ensure_compatible(generic_method, better_typed_method)
