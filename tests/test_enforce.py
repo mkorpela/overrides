@@ -109,6 +109,11 @@ class EnforceTests(unittest.TestCase):
             def register(self):
                 pass
 
+        with self.assertRaises(AssertionError):
+            class SubClass(MetaClassMethodOverrider):
+                def register(self):
+                    pass
+
     def test_ensure_compatible_when_compatible(self):
         def sup(a, /, b: str, c: int, *, d, e, **kwargs) -> object:
             pass
