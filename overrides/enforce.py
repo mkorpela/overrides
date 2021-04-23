@@ -45,8 +45,8 @@ def ensure_compatible(
             and not (x_param.kind == Parameter.KEYWORD_ONLY and y_var_kwargs):
             raise TypeError(f"`{name}` is not present.")
         elif name in y_sig.parameters \
-            and not (x_param.kind == Parameter.VAR_POSITIONAL) \
-            and not (x_param.kind == Parameter.VAR_KEYWORD):
+            and x_param.kind != Parameter.VAR_POSITIONAL \
+            and x_param.kind != Parameter.VAR_KEYWORD:
             y_index = list(y_sig.parameters.keys()).index(name)
             y_param = y_sig.parameters[name]
             
@@ -54,7 +54,8 @@ def ensure_compatible(
                 and not (x_param.kind == Parameter.POSITIONAL_ONLY and y_param.kind == Parameter.POSITIONAL_OR_KEYWORD) \
                 and not (x_param.kind == Parameter.KEYWORD_ONLY and y_param.kind == Parameter.POSITIONAL_OR_KEYWORD):
                 raise TypeError(f"`{name}` is not `{x_param.kind.description}`")
-            elif x_param.kind != Parameter.KEYWORD_ONLY and x_index != y_index:
+            elif x_index != y_index \
+                and x_param.kind != Parameter.KEYWORD_ONLY:
                 raise TypeError(f"`{name}` is not parameter `{x_index}`")
             elif x_param.annotation != Parameter.empty \
                 and y_param.annotation != Parameter.empty \
@@ -68,8 +69,8 @@ def ensure_compatible(
     for name, y_param in y_sig.parameters.items():
         if name not in x_sig.parameters \
             and y_param.default == Parameter.empty \
-            and not (y_param.kind == Parameter.VAR_POSITIONAL) \
-            and not (y_param.kind == Parameter.VAR_KEYWORD) \
+            and y_param.kind != Parameter.VAR_POSITIONAL \
+            and y_param.kind != Parameter.VAR_KEYWORD \
             and not (y_param.kind == Parameter.KEYWORD_ONLY and x_var_kwargs) \
             and not (y_param.kind == Parameter.POSITIONAL_ONLY and x_var_args) \
             and not (y_param.kind == Parameter.POSITIONAL_OR_KEYWORD and x_var_args):
