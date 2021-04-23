@@ -145,10 +145,10 @@ class EnforceTests(unittest.TestCase):
             ensure_compatible(sup, sub)
 
     def test_ensure_compatible_when_parameter_kinds_are_incompatible(self):
-        def sup(x, /, y):
+        def sup(x):
             pass
 
-        def sub(x, *, y):
+        def sub(*, x):
             pass
 
         with self.assertRaises(TypeError):
