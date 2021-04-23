@@ -7,107 +7,112 @@ import typing_utils
 
 
 def ensure_compatible(
-    x: Callable,
-    y: Callable,
+    super_callable: Callable,
+    sub_callable: Callable,
 ) -> None:
-    """Ensure that the signature of `y` is compatible with the signature of `x`.
+    """Ensure that the signature of `sub_callable` is compatible with the signature of `super_callable`.
 
-    Guarantees that any call to `x` will work on `y` by checking the following criteria:
+    Guarantees that any call to `super_callable` will work on `sub_callable` by checking the following criteria:
 
-    1. The return type of `y` is a subtype of the return type of `x`.
-    2. All parameters of `x` are present in `y`, unless `y` declares `*args` or `**kwargs`.
-    3. All positional parameters of `x` appear in the same order in `y`.
-    4. All parameters of `x` are a subtype of the corresponding parameters of `y`.
-    5. All required parameters of `y` are present in `x`, unless `x` declares `*args` or `**kwargs`.
+    1. The return type of `sub_callable` is a subtype of the return type of `super_callable`.
+    2. All parameters of `super_callable` are present in `sub_callable`, unless `sub_callable`
+       declares `*args` or `**kwargs`.
+    3. All positional parameters of `super_callable` appear in the same order in `sub_callable`.
+    4. All parameters of `super_callable` are a subtype of the corresponding parameters of `sub_callable`.
+    5. All required parameters of `sub_callable` are present in `super_callable`, unless `super_callable`
+       declares `*args` or `**kwargs`.
 
-    :param x: Function to check compatibility with.
-    :param y: Function to check compatibility of.
+    :param super_callable: Function to check compatibility with.
+    :param sub_callable: Function to check compatibility of.
     """
-    x_sig = inspect.signature(x)
-    y_sig = inspect.signature(y)
+    super_sig = inspect.signature(super_callable)
+    sub_sig = inspect.signature(sub_callable)
 
-    # Verify that the return type of `y` is a subtype of `x`.
-    if (
-        x_sig.return_annotation != Signature.empty
-        and y_sig.return_annotation != Signature.empty
-        and not typing_utils.issubtype(y_sig.return_annotation, x_sig.return_annotation)
-    ):
-        raise TypeError(
-            f"`{y_sig.return_annotation}` is not a `{x_sig.return_annotation}`."
-        )
+    ensure_return_type_compatibility(super_sig, sub_sig)
 
     # Verify that all parameters in `x` are specified in `y` and that their types are compatible.
-    y_var_args = any(
-        p.kind == Parameter.VAR_POSITIONAL for p in y_sig.parameters.values()
+    sub_has_var_args = any(
+        p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()
     )
-    y_var_kwargs = any(
-        p.kind == Parameter.VAR_KEYWORD for p in y_sig.parameters.values()
+    sub_has_var_kwargs = any(
+        p.kind == Parameter.VAR_KEYWORD for p in sub_sig.parameters.values()
     )
 
-    for x_index, (name, x_param) in enumerate(x_sig.parameters.items()):
+    for super_index, (name, super_param) in enumerate(super_sig.parameters.items()):
         if (
-            name not in y_sig.parameters
-            and not (x_param.kind == Parameter.VAR_POSITIONAL and not y_var_args)
-            and not (x_param.kind == Parameter.VAR_KEYWORD and not y_var_kwargs)
-            and not (x_param.kind == Parameter.POSITIONAL_ONLY and y_var_args)
+            name not in sub_sig.parameters
+            and not (super_param.kind == Parameter.VAR_POSITIONAL and not sub_has_var_args)
+            and not (super_param.kind == Parameter.VAR_KEYWORD and not sub_has_var_kwargs)
+            and not (super_param.kind == Parameter.POSITIONAL_ONLY and sub_has_var_args)
             and not (
-                x_param.kind == Parameter.POSITIONAL_OR_KEYWORD
-                and y_var_args
-                and y_var_kwargs
+                super_param.kind == Parameter.POSITIONAL_OR_KEYWORD
+                and sub_has_var_args
+                and sub_has_var_kwargs
             )
-            and not (x_param.kind == Parameter.KEYWORD_ONLY and y_var_kwargs)
+            and not (super_param.kind == Parameter.KEYWORD_ONLY and sub_has_var_kwargs)
         ):
             raise TypeError(f"`{name}` is not present.")
         elif (
-            name in y_sig.parameters
-            and x_param.kind != Parameter.VAR_POSITIONAL
-            and x_param.kind != Parameter.VAR_KEYWORD
+            name in sub_sig.parameters
+            and super_param.kind != Parameter.VAR_POSITIONAL
+            and super_param.kind != Parameter.VAR_KEYWORD
         ):
-            y_index = list(y_sig.parameters.keys()).index(name)
-            y_param = y_sig.parameters[name]
+            sub_index = list(sub_sig.parameters.keys()).index(name)
+            sub_param = sub_sig.parameters[name]
 
             if (
-                x_param.kind != y_param.kind
+                super_param.kind != sub_param.kind
                 and not (
-                    x_param.kind == Parameter.POSITIONAL_ONLY
-                    and y_param.kind == Parameter.POSITIONAL_OR_KEYWORD
+                    super_param.kind == Parameter.POSITIONAL_ONLY
+                    and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
                 )
                 and not (
-                    x_param.kind == Parameter.KEYWORD_ONLY
-                    and y_param.kind == Parameter.POSITIONAL_OR_KEYWORD
+                    super_param.kind == Parameter.KEYWORD_ONLY
+                    and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
                 )
             ):
-                raise TypeError(f"`{name}` is not `{x_param.kind.description}`")
-            elif x_index != y_index and x_param.kind != Parameter.KEYWORD_ONLY:
-                raise TypeError(f"`{name}` is not parameter `{x_index}`")
+                raise TypeError(f"`{name}` is not `{super_param.kind.description}`")
+            elif super_index != sub_index and super_param.kind != Parameter.KEYWORD_ONLY:
+                raise TypeError(f"`{name}` is not parameter `{super_index}`")
             elif (
-                x_param.annotation != Parameter.empty
-                and y_param.annotation != Parameter.empty
-                and not typing_utils.issubtype(x_param.annotation, y_param.annotation)
+                super_param.annotation != Parameter.empty
+                and sub_param.annotation != Parameter.empty
+                and not typing_utils.issubtype(super_param.annotation, sub_param.annotation)
             ):
                 raise TypeError(
-                    f"`{name} must be a supertype of `{x_param.annotation}`"
+                    f"`{name} must be a supertype of `{super_param.annotation}`"
                 )
 
     # Verify that no parameters are specified in `y` that are not specified in `x`.
-    x_var_args = any(
-        p.kind == Parameter.VAR_POSITIONAL for p in x_sig.parameters.values()
+    super_var_args = any(
+        p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
     )
-    x_var_kwargs = any(
-        p.kind == Parameter.VAR_KEYWORD for p in x_sig.parameters.values()
+    super_var_kwargs = any(
+        p.kind == Parameter.VAR_KEYWORD for p in super_sig.parameters.values()
     )
 
-    for name, y_param in y_sig.parameters.items():
+    for name, sub_param in sub_sig.parameters.items():
         if (
-            name not in x_sig.parameters
-            and y_param.default == Parameter.empty
-            and y_param.kind != Parameter.VAR_POSITIONAL
-            and y_param.kind != Parameter.VAR_KEYWORD
-            and not (y_param.kind == Parameter.KEYWORD_ONLY and x_var_kwargs)
-            and not (y_param.kind == Parameter.POSITIONAL_ONLY and x_var_args)
-            and not (y_param.kind == Parameter.POSITIONAL_OR_KEYWORD and x_var_args)
+            name not in super_sig.parameters
+            and sub_param.default == Parameter.empty
+            and sub_param.kind != Parameter.VAR_POSITIONAL
+            and sub_param.kind != Parameter.VAR_KEYWORD
+            and not (sub_param.kind == Parameter.KEYWORD_ONLY and super_var_kwargs)
+            and not (sub_param.kind == Parameter.POSITIONAL_ONLY and super_var_args)
+            and not (sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD and super_var_args)
         ):
             raise TypeError(f"`{name}` is not a valid parameter.")
+
+
+def ensure_return_type_compatibility(super_sig, sub_sig):
+    if (
+            super_sig.return_annotation != Signature.empty
+            and sub_sig.return_annotation != Signature.empty
+            and not typing_utils.issubtype(sub_sig.return_annotation, super_sig.return_annotation)
+    ):
+        raise TypeError(
+            f"`{sub_sig.return_annotation}` is not a `{super_sig.return_annotation}`."
+        )
 
 
 class EnforceOverridesMeta(ABCMeta):
