@@ -104,6 +104,11 @@ class EnforceTests(unittest.TestCase):
         self.assertNotEqual(ClassMethodOverrider.nonfinal_classmethod(),
                             Enforcing.nonfinal_classmethod())
 
+    def test_enforcing_when_metaclass_method_overridden(self):
+        class MetaClassMethodOverrider(Enforcing):
+            def register(self):
+                pass
+
     def test_ensure_compatible_when_compatible(self):
         def sup(a, /, b: str, c: int, *, d, e, **kwargs) -> object:
             pass
@@ -113,7 +118,6 @@ class EnforceTests(unittest.TestCase):
 
         ensure_compatible(sup, sub)
         
-
     def test_ensure_compatible_when_return_types_are_incompatible(self):
         def sup(x) -> int:
             pass
