@@ -19,7 +19,7 @@ import sys
 from types import FunctionType
 from typing import List, Tuple, TypeVar
 
-__VERSION__ = "3.1.0"
+__VERSION__ = "4.0.0"
 
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=FunctionType)
