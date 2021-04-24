@@ -219,10 +219,10 @@ class EnforceTests(unittest.TestCase):
             ensure_compatible(generic_method, better_typed_method)
 
     def test_if_super_has_args_then_sub_must_have(self):
-        def sub1(x, y, z):
+        def sub1(x, y, z, /):
             pass
 
-        def subbest(x, *burgs):
+        def subbest(x, /, *burgs):
             pass
 
         def supah(*args):
@@ -236,10 +236,10 @@ class EnforceTests(unittest.TestCase):
             ensure_compatible(subbest, sub1)
 
     def test_if_super_has_kwargs_then_sub_must_have(self):
-        def sub1(x=3, y=3, z=4):
+        def sub1(*, x=3, y=3, z=4):
             pass
 
-        def subbest(x=3, **kwargs):
+        def subbest(*, x=3, **kwargs):
             pass
 
         def supah(**kwargs):
