@@ -98,6 +98,8 @@ Use ``EnforceOverrides`` to require subclass methods that shadow superclass meth
 with ``@overrides``.
 
 .. code-block:: python
+ 
+    from overrides import EnforceOverrides
 
     class SuperClass(EnforceOverrides):
 
@@ -113,7 +115,9 @@ Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@over
 
 .. code-block:: python
 
-    class SuperClass(EnforceOverrides):
+    from overrides import overrides
+    
+    class SuperClass:
 
         @staticmethod
         def foo(self):
