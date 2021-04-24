@@ -123,6 +123,11 @@ def ensure_return_type_compatibility(super_sig, sub_sig):
 
 class EnforceOverridesMeta(ABCMeta):
     def __new__(mcls, name, bases, namespace, **kwargs):
+        # Ignore any methods defined on the metaclass when enforcing overrides.
+        for method in dir(mcls):
+            if not method.startswith("__") and method != "mro":
+                setattr(getattr(mcls, method), "__ignored__", True)
+
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         for name, value in namespace.items():
             # Actually checking the direct parent should be enough,
@@ -133,7 +138,7 @@ class EnforceOverridesMeta(ABCMeta):
             is_override = getattr(value, "__override__", False)
             for base in bases:
                 base_class_method = getattr(base, name, False)
-                if not base_class_method or not callable(base_class_method):
+                if not base_class_method or not callable(base_class_method) or getattr(base_class_method, "__ignored__", False):
                     continue
                 assert (
                     is_override
