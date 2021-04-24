@@ -1,12 +1,6 @@
 overrides
 =========
 
-.. image:: https://api.travis-ci.org/mkorpela/overrides.svg
-        :target: https://travis-ci.org/mkorpela/overrides
-
-.. image:: https://coveralls.io/repos/mkorpela/overrides/badge.svg
-        :target: https://coveralls.io/r/mkorpela/overrides
-
 .. image:: https://img.shields.io/pypi/v/overrides.svg
         :target: https://pypi.python.org/pypi/overrides
 
