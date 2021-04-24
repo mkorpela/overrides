@@ -80,7 +80,7 @@ def is_param_defined_in_sub(name, sub_has_var_args, sub_has_var_kwargs, sub_sig,
             name in sub_sig.parameters
             or (super_param.kind == Parameter.VAR_POSITIONAL and sub_has_var_args)
             or (super_param.kind == Parameter.VAR_KEYWORD and sub_has_var_kwargs)
-            or (super_param.kind == Parameter.POSITIONAL_ONLY and not sub_has_var_args)
+            or (super_param.kind == Parameter.POSITIONAL_ONLY and sub_has_var_args)
             or (
             super_param.kind == Parameter.POSITIONAL_OR_KEYWORD
             and sub_has_var_args
