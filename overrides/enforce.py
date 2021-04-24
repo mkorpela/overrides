@@ -2,7 +2,7 @@ import inspect
 from abc import ABCMeta
 from inspect import Parameter, Signature
 from types import FunctionType
-from typing import Callable, TypeVar, Union
+from typing import Callable, TypeVar, Union, get_type_hints
 
 from typing_utils import issubtype  # type: ignore
 
@@ -28,14 +28,16 @@ def ensure_signature_is_compatible(
     :param sub_callable: Function to check compatibility of.
     """
     super_sig = inspect.signature(super_callable)
+    super_type_hints = get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
+    sub_type_hints = get_type_hints(sub_callable)
 
-    ensure_return_type_compatibility(super_sig, sub_sig)
-    ensure_all_args_defined_in_sub(super_sig, sub_sig)
+    ensure_return_type_compatibility(super_type_hints, sub_type_hints)
+    ensure_all_args_defined_in_sub(super_sig, sub_sig, super_type_hints, sub_type_hints)
     ensure_no_extra_args_in_sub(super_sig, sub_sig)
 
 
-def ensure_all_args_defined_in_sub(super_sig, sub_sig):
+def ensure_all_args_defined_in_sub(super_sig, sub_sig, super_type_hints, sub_type_hints):
     sub_has_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()
     )
@@ -68,9 +70,9 @@ def ensure_all_args_defined_in_sub(super_sig, sub_sig):
             elif super_index != sub_index and super_param.kind != Parameter.KEYWORD_ONLY:
                 raise TypeError(f"`{name}` is not parameter `{super_index}`")
             elif (
-                    super_param.annotation != Parameter.empty
-                    and sub_param.annotation != Parameter.empty
-                    and not issubtype(super_param.annotation, sub_param.annotation)
+                    name in super_type_hints
+                    and name in sub_type_hints
+                    and not issubtype(super_type_hints[name], sub_type_hints[name])
             ):
                 raise TypeError(
                     f"`{name} must be a supertype of `{super_param.annotation}`"
@@ -112,14 +114,14 @@ def ensure_no_extra_args_in_sub(super_sig, sub_sig):
             raise TypeError(f"`{name}` is not a valid parameter.")
 
 
-def ensure_return_type_compatibility(super_sig, sub_sig):
+def ensure_return_type_compatibility(super_type_hints, sub_type_hints):
     if (
-            super_sig.return_annotation != Signature.empty
-            and sub_sig.return_annotation != Signature.empty
-            and not issubtype(sub_sig.return_annotation, super_sig.return_annotation)
+            'return' in super_type_hints
+            and 'return' in sub_type_hints
+            and not issubtype(sub_type_hints['return'], super_type_hints['return'])
     ):
         raise TypeError(
-            f"`{sub_sig.return_annotation}` is not a `{super_sig.return_annotation}`."
+            f"`{sub_type_hints['return']}` is not a `{super_type_hints['return']}`."
         )
 
 

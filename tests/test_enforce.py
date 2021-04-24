@@ -124,6 +124,15 @@ class EnforceTests(unittest.TestCase):
 
         ensure_signature_is_compatible(sup, sub)
 
+    def test_ensure_compatible_when_type_hints_are_strings(self):        
+        def sup(x: "str") -> "object":
+            pass
+
+        def sub(x: "object") -> "str":
+            pass
+
+        ensure_signature_is_compatible(sup, sub)
+
     def test_ensure_compatible_when_return_types_are_incompatible(self):
         def sup(x) -> int:
             pass
