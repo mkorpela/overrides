@@ -217,3 +217,37 @@ class EnforceTests(unittest.TestCase):
         ensure_compatible(better_typed_method, generic_method)
         with self.assertRaises(TypeError):
             ensure_compatible(generic_method, better_typed_method)
+
+    def test_if_super_has_args_then_sub_must_have(self):
+        def sub1(x, y, z):
+            pass
+
+        def subbest(x, *burgs):
+            pass
+
+        def supah(*args):
+            pass
+
+        ensure_compatible(supah, subbest)
+        ensure_compatible(sub1, subbest)
+        with self.assertRaises(TypeError):
+            ensure_compatible(supah, sub1)
+        with self.assertRaises(TypeError):
+            ensure_compatible(subbest, sub1)
+
+    def test_if_super_has_kwargs_then_sub_must_have(self):
+        def sub1(x=3, y=3, z=4):
+            pass
+
+        def subbest(x=3, *kwargs):
+            pass
+
+        def supah(*kwargs):
+            pass
+
+        ensure_compatible(supah, subbest)
+        ensure_compatible(sub1, subbest)
+        with self.assertRaises(TypeError):
+            ensure_compatible(supah, sub1)
+        with self.assertRaises(TypeError):
+            ensure_compatible(subbest, sub1)
