@@ -239,10 +239,10 @@ class EnforceTests(unittest.TestCase):
         def sub1(x=3, y=3, z=4):
             pass
 
-        def subbest(x=3, *kwargs):
+        def subbest(x=3, **kwargs):
             pass
 
-        def supah(*kwargs):
+        def supah(**kwargs):
             pass
 
         ensure_compatible(supah, subbest)
