@@ -6,7 +6,7 @@ from typing import Callable
 from typing_utils import issubtype
 
 
-def ensure_compatible(
+def ensure_signature_is_compatible(
     super_callable: Callable,
     sub_callable: Callable,
 ) -> None:
@@ -150,7 +150,7 @@ class EnforceOverridesMeta(ABCMeta):
                     base_class_method,
                     base,
                 )
-                ensure_compatible(base_class_method, value)
+                ensure_signature_is_compatible(base_class_method, value)
         return cls
 
     @staticmethod
