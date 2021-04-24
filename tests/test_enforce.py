@@ -1,3 +1,4 @@
+import sys
 from typing import Dict, Union, Optional
 
 import unittest
@@ -6,7 +7,6 @@ from overrides.enforce import ensure_compatible
 
 
 class Enforcing(EnforceOverrides):
-
     classVariableIsOk = "OK?"
 
     @final
@@ -52,6 +52,7 @@ class EnforceTests(unittest.TestCase):
             class BrokesFinality(Enforcing):
                 def finality(self):
                     return "NEVER HERE"
+
             raise RuntimeError('Should not go here')
         except AssertionError:
             pass
@@ -61,6 +62,7 @@ class EnforceTests(unittest.TestCase):
             class Overrider(Enforcing):
                 def nonfinal2(self):
                     return "NEVER HERE EITHER"
+
             raise RuntimeError('Should not go here')
         except AssertionError:
             pass
@@ -114,15 +116,16 @@ class EnforceTests(unittest.TestCase):
                 def register(self):
                     pass
 
-    def test_ensure_compatible_when_compatible(self):
-        def sup(a, /, b: str, c: int, *, d, e, **kwargs) -> object:
-            pass
+    if sys.version_info[0] > 3 and sys.version_info[1] > 7:
+        def test_ensure_compatible_when_compatible(self):
+            def sup(a, /, b: str, c: int, *, d, e, **kwargs) -> object:
+                pass
 
-        def sub(a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs) -> str:
-            pass
+            def sub(a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs) -> str:
+                pass
 
-        ensure_compatible(sup, sub)
-        
+            ensure_compatible(sup, sub)
+
     def test_ensure_compatible_when_return_types_are_incompatible(self):
         def sup(x) -> int:
             pass
@@ -132,7 +135,7 @@ class EnforceTests(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             ensure_compatible(sup, sub)
-    
+
     def test_ensure_compatible_when_parameter_positions_are_incompatible(self):
         def sup(x, y):
             pass
@@ -142,7 +145,7 @@ class EnforceTests(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             ensure_compatible(sup, sub)
-    
+
     def test_ensure_compatible_when_parameter_types_are_incompatible(self):
         def sup(x: object):
             pass
@@ -194,19 +197,23 @@ class EnforceTests(unittest.TestCase):
             ensure_compatible(sup, sub)
 
     def test_union_compatible(self):
-        def sup(x:int):
+        def sup(x: int):
             pass
-        def sub(x:Union[int, str]):
+
+        def sub(x: Union[int, str]):
             pass
+
         ensure_compatible(sup, sub)
         with self.assertRaises(TypeError):
             ensure_compatible(sub, sup)
 
     def test_generic_sub(self):
-        def better_typed_method(x:int, y:Optional[str], z:float = 3.0):
+        def better_typed_method(x: int, y: Optional[str], z: float = 3.0):
             pass
+
         def generic_method(*args, **kwargs):
             pass
+
         ensure_compatible(better_typed_method, generic_method)
         with self.assertRaises(TypeError):
             ensure_compatible(generic_method, better_typed_method)
