@@ -1,0 +1,6 @@
+from typing import Any
+
+__VERSION__: str
+
+def overrides(method: _WrappedMethod) -> _WrappedMethod: ...
+def op_stream(code: Any, max: Any): ...
