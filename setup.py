@@ -16,7 +16,7 @@ with open(join(CURDIR, 'README.rst')) as f:
     LONG_DESCRIPTION = f.read()
 
 setup(name='overrides',
-      version='4.1.0',
+      version='4.1.1',
       description=desc,
       long_description=LONG_DESCRIPTION,
       author=name,
