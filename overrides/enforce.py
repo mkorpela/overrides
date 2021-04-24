@@ -3,7 +3,7 @@ from abc import ABCMeta
 from inspect import Parameter, Signature
 from typing import Callable
 
-from typing_utils import issubtype
+from typing_utils import issubtype  # type: ignore
 
 
 def ensure_signature_is_compatible(

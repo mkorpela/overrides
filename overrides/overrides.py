@@ -17,12 +17,12 @@
 import dis
 import sys
 from types import FunctionType
-from typing import List, Tuple, TypeVar
+from typing import List, Tuple, TypeVar, Union, Callable
 
 __VERSION__ = "4.0.1"
 
 
-_WrappedMethod = TypeVar("_WrappedMethod", bound=FunctionType)
+_WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
 
 def overrides(method: _WrappedMethod) -> _WrappedMethod:

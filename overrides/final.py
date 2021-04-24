@@ -14,12 +14,12 @@
 #  limitations under the License.
 #
 from types import FunctionType
-from typing import TypeVar
+from typing import TypeVar, Union, Callable
 
 __VERSION__ = "0.1"
 
 
-_WrappedMethod = TypeVar("_WrappedMethod", bound=FunctionType)
+_WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
 
 def final(method: _WrappedMethod) -> _WrappedMethod:
