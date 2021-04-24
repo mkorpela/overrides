@@ -2,8 +2,7 @@ from abc import ABCMeta
 import inspect
 from inspect import Parameter, Signature
 from typing import Callable
-
-import typing_utils
+from typing_utils import issubtype
 
 
 def ensure_compatible(
@@ -68,7 +67,7 @@ def ensure_all_args_defined_in_sub(super_sig, sub_sig):
             elif (
                     super_param.annotation != Parameter.empty
                     and sub_param.annotation != Parameter.empty
-                    and not typing_utils.issubtype(super_param.annotation, sub_param.annotation)
+                    and not issubtype(super_param.annotation, sub_param.annotation)
             ):
                 raise TypeError(
                     f"`{name} must be a supertype of `{super_param.annotation}`"
@@ -114,7 +113,7 @@ def ensure_return_type_compatibility(super_sig, sub_sig):
     if (
             super_sig.return_annotation != Signature.empty
             and sub_sig.return_annotation != Signature.empty
-            and not typing_utils.issubtype(sub_sig.return_annotation, super_sig.return_annotation)
+            and not issubtype(sub_sig.return_annotation, super_sig.return_annotation)
     ):
         raise TypeError(
             f"`{sub_sig.return_annotation}` is not a `{super_sig.return_annotation}`."
