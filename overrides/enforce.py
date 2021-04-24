@@ -1,14 +1,16 @@
 import inspect
 from abc import ABCMeta
 from inspect import Parameter, Signature
-from typing import Callable
+from types import FunctionType
+from typing import Callable, TypeVar, Union
 
-from typing_utils import issubtype
+from typing_utils import issubtype  # type: ignore
 
+_WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
 def ensure_signature_is_compatible(
-    super_callable: Callable,
-    sub_callable: Callable,
+    super_callable: _WrappedMethod,
+    sub_callable: _WrappedMethod,
 ) -> None:
     """Ensure that the signature of `sub_callable` is compatible with the signature of `super_callable`.
 
