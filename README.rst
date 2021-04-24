@@ -2,115 +2,134 @@ overrides
 =========
 
 .. image:: https://img.shields.io/pypi/v/overrides.svg
-        :target: https://pypi.python.org/pypi/overrides
+  :target: https://pypi.python.org/pypi/overrides
 
 .. image:: http://pepy.tech/badge/overrides
-        :target: http://pepy.tech/project/overrides
+  :target: http://pepy.tech/project/overrides
 
-A decorator to automatically detect mismatch when overriding a method.
-See http://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-overriding-a-method
+A decorator that verifies that a method that should override an inherited method actually does, and
+that copies the docstring of the inherited method to the overridden method. Since signature 
+validation and docstring inheritance are performed on class creation and not on class instantiation, 
+this library significantly improves the safety and experience of creating class hierarchies in 
+Python without significantly impacting performance. See https://stackoverflow.com/q/1167617 for the
+initial inspiration for this library.
 
-All checks are done when a class or a method is created and *not* when a method is executed or
-an instance of a class is created. This means that performance implications are minimal.
+Motivation
+----------
 
-*Note:*
-Version 2.8.0 is the last one that supports Python 2.7.
-Versions after that work with Python >= 3.6.
+Python has no standard mechanism by which to guarantee that (1) a method that overrides an inherited 
+method has a compatible signature, (2) a method that previously overrode an inherited method
+continues to do so, and (3) a method that previously did not override an inherited method now does.
+This opens the door for subtle problems as class hierarchies evolve over time. For example,
 
-Why explicit overrides?
------------------------
+1. A method that is added to a superclass is shadowed by an existing method with the same name in a 
+   subclass.
 
-Overrides without explicit indicator for them are weak. They leave room for problems that happen during the evolution of a codebase.
+2. A method of a superclass that is overridden by a subclass is renamed in the superclass but not in 
+   the subclass.
 
-1. (create) Accidental overriding in a subclass when a method to a superclass is added (or vice versa).
-2. (modify) Rename of a superclass method without subclass method rename (or vice versa).
-3. (delete) Deleting of a superclass method without detecting in subclass that the method is not anymore overriding anything (or vice versa).
+3. A method of a superclass that is overridden by a subclass is removed in the superclass but not in
+   the subclass.
 
-These might happen for example when overriding a method in a module that does not live in your codebase, or when merging changes done by someone else to the codebase without having access to your subclass.
+4. A method of a superclass that is overridden by a subclass but the signature of the overridden
+   method is incompatible with that of the inherited one.
+
+Python also has no standard mechanism by which to inherit docstrings in overridden methods. Because 
+most standard linters (e.g., flake8) have rules that require all public methods to have a docstring, 
+this inevitably leads to a proliferation of ``See parent class for usage`` docstrings on overridden
+methods, or, worse, to a disabling of these rules altogether. In addition, mediocre or missing
+docstrings degrade the quality of tooltips and completions that can be provided by an editor.
 
 Installation
 ------------
+
+Compatible with Python 3.6+.
+
 .. code-block:: bash
 
     $ pip install overrides
 
 Usage
 -----
+
+Use ``@overrides`` to indicate that a subclass method should override a superclass method.
+
 .. code-block:: python
 
     from overrides import overrides
 
     class SuperClass:
 
-        def method(self):
-            """This is the doc for a method and will be shown in subclass method too!"""
-            return 2
+        def foo(self):
+            """This docstring will be inherited by any method that overrides this!"""
+            return 1
 
+        def bar(self, x) -> str:
+            return x
 
     class SubClass(SuperClass):
 
         @overrides
-        def method(self):
-            return 1
+        def foo(self):
+            return 2
 
+        @overrides
+        def bar(self, y) -> int: # Raises, because the signature is not compatible.
+            return y
 
-Enforcing usage
----------------
+Use ``@final`` to indicate that a superclass method cannot be overriden.
 
 .. code-block:: python
 
+    from overrides import final
 
-    from overrides import EnforceOverrides, final, overrides
+    class SuperClass:
+
+        @final
+        def foo(self):
+            return 1
+
+    class SubClass(SuperClass):
+
+        def foo(self): # Raises, because overriding a final method is forbidden.
+            return 2
+
+Use ``EnforceOverrides`` to require subclass methods that shadow superclass methods to be decorated 
+with ``@overrides``.
+
+.. code-block:: python
 
     class SuperClass(EnforceOverrides):
 
-        @final
-        def method(self):
-            """This is the doc for a method and will be shown in subclass method too!"""
+        def foo(self):
+            return 1
+
+    class SubClass(SuperClass):
+
+        def foo(self): # Raises, because @overrides is missing.
             return 2
 
-        def method2(self):
-            """This is the doc for a method and will be shown in subclass method too!"""
-            return 2
+Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@overrides``.
+
+.. code-block:: python
+
+    class SuperClass(EnforceOverrides):
 
         @staticmethod
-        def method3():
-            """This is the doc for a method and will be shown in subclass method too!"""
-            return 2
-
-
-    # THIS FAILS
-    class SubClass1(SuperClass):
-
-        def method(self): # <-- overriding a final method
+        def foo(self):
             return 1
 
-
-    # THIS FAILS
-    class SubClass2(SuperClass):
-
-        def method2(self): # <-- @overrides decorator missing
-            return 1
-
-
-    # THIS ONE IS OK
-    class SubClass3(SuperClass):
-
-        @overrides
-        def method2(self):
-            return 1
-
-
-    # ENSURE THAT @classmethod AND @staticmethod ARE PLACED AT THE TOP
-    class SubClass4(SuperClass):
+    class SubClass(SuperClass):
 
         @staticmethod
         @overrides
-        def method3():
-            return 1
- 
+        def foo(self):
+            return 2
+
 Contributors
 ------------
+
 This project becomes a reality only through the work of all the people who contribute.
 
-mkorpela, drorasaf, ngoodman90, TylerYep, leeopop, donpatrice, jayvdb, joelgrus, lisyarus, soulmerge, rkr-at-dbx, ashwin153
+mkorpela, drorasaf, ngoodman90, TylerYep, leeopop, donpatrice, jayvdb, joelgrus, lisyarus, 
+soulmerge, rkr-at-dbx, ashwin153
