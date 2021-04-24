@@ -113,4 +113,4 @@ Contributors
 ------------
 This project becomes a reality only through the work of all the people who contribute.
 
-mkorpela, drorasaf, ngoodman90, TylerYep, leeopop, donpatrice, jayvdb, joelgrus, lisyarus, soulmerge, rkr-at-dbx
+mkorpela, drorasaf, ngoodman90, TylerYep, leeopop, donpatrice, jayvdb, joelgrus, lisyarus, soulmerge, rkr-at-dbx, ashwin153
