@@ -14,10 +14,10 @@
 #  limitations under the License.
 #
 
-import sys
 import dis
-from typing import List, Tuple, TypeVar
+import sys
 from types import FunctionType
+from typing import List, Tuple, TypeVar
 
 __VERSION__ = "3.1.0"
 

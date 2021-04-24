@@ -1,7 +1,7 @@
 import sys
-from typing import Dict, Union, Optional
-
 import unittest
+from typing import Union, Optional
+
 from overrides import overrides, final, EnforceOverrides
 from overrides.enforce import ensure_compatible
 

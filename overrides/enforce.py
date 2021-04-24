@@ -1,7 +1,8 @@
-from abc import ABCMeta
 import inspect
+from abc import ABCMeta
 from inspect import Parameter, Signature
 from typing import Callable
+
 from typing_utils import issubtype
 
 
