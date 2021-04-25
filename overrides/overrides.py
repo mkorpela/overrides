@@ -79,8 +79,10 @@ def _validate_method(method, super_class, check_signature):
             raise TypeError(f"{method.__name__}: is finalized")
     if not method.__doc__:
         method.__doc__ = super_method.__doc__
-    if check_signature and not method.__name__.startswith("__") and not isinstance(
-            super_method, property
+    if (
+        check_signature
+        and not method.__name__.startswith("__")
+        and not isinstance(super_method, property)
     ):
         ensure_signature_is_compatible(super_method, method)
 

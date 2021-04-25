@@ -48,21 +48,23 @@ class EnforceTests(unittest.TestCase):
 
     def test_enforcing_when_finality_broken(self):
         try:
+
             class BrokesFinality(Enforcing):
                 def finality(self):
                     return "NEVER HERE"
 
-            raise RuntimeError('Should not go here')
+            raise RuntimeError("Should not go here")
         except AssertionError:
             pass
 
     def test_enforcing_when_none_explicit_override(self):
         try:
+
             class Overrider(Enforcing):
                 def nonfinal2(self):
                     return "NEVER HERE EITHER"
 
-            raise RuntimeError('Should not go here')
+            raise RuntimeError("Should not go here")
         except AssertionError:
             pass
 
@@ -73,11 +75,13 @@ class EnforceTests(unittest.TestCase):
             def nonfinal_property(self):
                 return "subclass_property"
 
-        self.assertNotEqual(PropertyOverrider.nonfinal_property,
-                            Enforcing.nonfinal_property)
+        self.assertNotEqual(
+            PropertyOverrider.nonfinal_property, Enforcing.nonfinal_property
+        )
 
     def test_enforcing_when_incompatible(self):
         with self.assertRaises(TypeError):
+
             class Incompatible(Enforcing):
                 @overrides
                 def nonfinal1(self, param: str):
@@ -102,8 +106,10 @@ class EnforceTests(unittest.TestCase):
             def nonfinal_classmethod(cls):
                 return "subclass_classmethod"
 
-        self.assertNotEqual(ClassMethodOverrider.nonfinal_classmethod(),
-                            Enforcing.nonfinal_classmethod())
+        self.assertNotEqual(
+            ClassMethodOverrider.nonfinal_classmethod(),
+            Enforcing.nonfinal_classmethod(),
+        )
 
     def test_enforcing_when_metaclass_method_overridden(self):
         class MetaClassMethodOverrider(Enforcing):
@@ -111,6 +117,7 @@ class EnforceTests(unittest.TestCase):
                 pass
 
         with self.assertRaises(AssertionError):
+
             class SubClass(MetaClassMethodOverrider):
                 def register(self):
                     pass
@@ -119,12 +126,14 @@ class EnforceTests(unittest.TestCase):
         def sup(a, /, b: str, c: int, *, d, e, **kwargs) -> object:
             pass
 
-        def sub(a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs) -> str:
+        def sub(
+            a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
+        ) -> str:
             pass
 
         ensure_signature_is_compatible(sup, sub)
 
-    def test_ensure_compatible_when_type_hints_are_strings(self):        
+    def test_ensure_compatible_when_type_hints_are_strings(self):
         def sup(x: "str") -> "object":
             pass
 
