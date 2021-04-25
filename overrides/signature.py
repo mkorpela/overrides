@@ -1,7 +1,7 @@
 import inspect
 from inspect import Parameter
 from types import FunctionType
-from typing import Callable, TypeVar, Union, get_type_hints
+from typing import Callable, TypeVar, Union, get_type_hints, Tuple, Dict
 
 from typing_utils import issubtype  # type: ignore
 
@@ -27,8 +27,8 @@ def ensure_signature_is_compatible(
     :param super_callable: Function to check compatibility with.
     :param sub_callable: Function to check compatibility of.
     """
-    super_callable = _unbound_func(super_callable)
-    sub_callable = _unbound_func(sub_callable)
+    super_callable, is_bound_super = _unbound_func(super_callable)
+    sub_callable, is_bound_sub = _unbound_func(sub_callable)
     super_sig = inspect.signature(super_callable)
     super_type_hints = get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
@@ -39,10 +39,10 @@ def ensure_signature_is_compatible(
     ensure_no_extra_args_in_sub(super_sig, sub_sig)
 
 
-def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
+def _unbound_func(callable: _WrappedMethod) -> Tuple[_WrappedMethod, bool]:
     if hasattr(callable, "__self__") and hasattr(callable, "__func__"):
-        return callable.__func__
-    return callable
+        return callable.__func__, True
+    return callable, False
 
 
 def ensure_all_args_defined_in_sub(
@@ -132,12 +132,12 @@ def ensure_no_extra_args_in_sub(super_sig, sub_sig):
             raise TypeError(f"`{name}` is not a valid parameter.")
 
 
-def ensure_return_type_compatibility(super_type_hints, sub_type_hints):
+def ensure_return_type_compatibility(super_type_hints: Dict, sub_type_hints: Dict):
+    super_return = super_type_hints.get("return", None)
+    sub_return = sub_type_hints.get("return", None)
     if (
-        "return" in super_type_hints
-        and "return" in sub_type_hints
-        and not issubtype(sub_type_hints["return"], super_type_hints["return"])
+        not issubtype(sub_return, super_return)
     ):
         raise TypeError(
-            f"`{sub_type_hints['return']}` is not a `{super_type_hints['return']}`."
+            f"`{sub_return}` is not a `{super_return}`."
         )
