@@ -27,6 +27,10 @@ def ensure_signature_is_compatible(
     :param super_callable: Function to check compatibility with.
     :param sub_callable: Function to check compatibility of.
     """
+    if (hasattr(super_callable, "__self__") and hasattr(super_callable, "__func__")):
+        super_callable = super_callable.__func__
+    if (hasattr(sub_callable, "__self__") and hasattr(sub_callable, "__func__")):
+        sub_callable = sub_callable.__func__
     super_sig = inspect.signature(super_callable)
     super_type_hints = get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)

@@ -68,9 +68,6 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
             if not method.__name__.startswith("__") and not isinstance(
                 super_method, property
             ):
-                if type(method) != type(super_method):
-                    # FIXME: this is a hack for cases where super is already bound
-                    super_method = super_method.__func__
                 ensure_signature_is_compatible(method, super_method)
             return method
     raise AssertionError('No super class method found for "%s"' % method.__name__)
