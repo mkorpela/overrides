@@ -57,20 +57,32 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
     setattr(method, "__override__", True)
     for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
         if hasattr(super_class, method.__name__):
-            super_method = getattr(super_class, method.__name__)
-            if hasattr(super_method, "__finalized__"):
-                finalized = getattr(super_method, "__finalized__")
-                if finalized:
-                    raise TypeError(f"{method.__name__}: is finalized")
-            if not method.__doc__:
-                method.__doc__ = super_method.__doc__
-            # TODO: special methods signatures behave in odd ways -> do not check them
-            if not method.__name__.startswith("__") and not isinstance(
-                super_method, property
-            ):
-                ensure_signature_is_compatible(super_method, method)
+            _validate_method(method, super_class, True)
             return method
     raise TypeError(f"{method.__name__}: No super class method found")
+
+
+def overrides_ignore_signature(method: _WrappedMethod) -> _WrappedMethod:
+    setattr(method, "__override__", True)
+    for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
+        if hasattr(super_class, method.__name__):
+            _validate_method(method, super_class, False)
+            return method
+    raise TypeError(f"{method.__name__}: No super class method found")
+
+
+def _validate_method(method, super_class, check_signature):
+    super_method = getattr(super_class, method.__name__)
+    if hasattr(super_method, "__finalized__"):
+        finalized = getattr(super_method, "__finalized__")
+        if finalized:
+            raise TypeError(f"{method.__name__}: is finalized")
+    if not method.__doc__:
+        method.__doc__ = super_method.__doc__
+    if check_signature and not method.__name__.startswith("__") and not isinstance(
+            super_method, property
+    ):
+        ensure_signature_is_compatible(super_method, method)
 
 
 def _get_base_classes(frame, namespace):

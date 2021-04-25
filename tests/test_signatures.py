@@ -1,6 +1,6 @@
 from typing import Union
 
-from overrides import overrides
+from overrides import overrides, overrides_ignore_signature
 
 
 class SuperbClass:
@@ -40,6 +40,13 @@ class NormalMethodOverrider(SuperbClass):
     @overrides
     def normal_method(self, x: int, y: str = 'zoo', *args, **kwargs) -> bool:
         return x % 3 == 1 or y in kwargs or x == len(args)
+
+
+class OverridesWithSignatureIgnore(SuperbClass):
+
+    @overrides_ignore_signature
+    def normal_method(self, x: int) -> bool:
+        return x % 2 == 1
 
 
 def test_that_this_file_is_ok():
