@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 from types import FunctionType
-from typing import TypeVar, Union, Callable
+from typing import Callable, TypeVar, Union
 
 __VERSION__ = "0.1"
 

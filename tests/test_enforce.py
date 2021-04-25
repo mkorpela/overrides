@@ -2,7 +2,7 @@ import unittest
 from typing import Union, Optional
 
 from overrides import overrides, final, EnforceOverrides
-from overrides.enforce import ensure_signature_is_compatible
+from overrides.signature import ensure_signature_is_compatible
 
 
 class Enforcing(EnforceOverrides):

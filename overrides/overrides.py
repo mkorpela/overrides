@@ -17,7 +17,7 @@
 import dis
 import sys
 from types import FunctionType
-from typing import List, Tuple, TypeVar, Union, Callable
+from typing import Callable, List, Tuple, TypeVar, Union
 
 __VERSION__ = "4.1.1"
 
