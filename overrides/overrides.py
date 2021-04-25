@@ -61,16 +61,16 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
             if hasattr(super_method, "__finalized__"):
                 finalized = getattr(super_method, "__finalized__")
                 if finalized:
-                    raise AssertionError('Method "%s" is finalized' % method.__name__)
+                    raise TypeError(f'{method.__name__}: is finalized')
             if not method.__doc__:
                 method.__doc__ = super_method.__doc__
             # TODO: special methods signatures behave in odd ways -> do not check them
             if not method.__name__.startswith("__") and not isinstance(
                 super_method, property
             ):
-                ensure_signature_is_compatible(method, super_method)
+                ensure_signature_is_compatible(super_method, method)
             return method
-    raise AssertionError('No super class method found for "%s"' % method.__name__)
+    raise TypeError(f"{method.__name__}: No super class method found")
 
 
 def _get_base_classes(frame, namespace):

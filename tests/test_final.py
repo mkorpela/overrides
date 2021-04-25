@@ -61,7 +61,7 @@ class FinalTests(unittest.TestCase):
                 def some_finalized_method(self):
                     pass
             raise RuntimeError('Should not go here')
-        except AssertionError:
+        except TypeError:
             pass
 
     def test_final_fails_another_package(self):
@@ -78,7 +78,7 @@ class FinalTests(unittest.TestCase):
                     pass
 
             raise RuntimeError('Should not go here')
-        except AssertionError:
+        except TypeError:
             pass
 
     def test_final_fails_deep(self):
@@ -95,7 +95,7 @@ class FinalTests(unittest.TestCase):
                     pass
 
             raise RuntimeError('Should not go here')
-        except AssertionError:
+        except TypeError:
             pass
 
     def test_final_fails_in_middle(self):
@@ -112,7 +112,7 @@ class FinalTests(unittest.TestCase):
                     pass
 
             raise RuntimeError('Should not go here')
-        except AssertionError:
+        except TypeError:
             pass
 
     def test_final_fails_from_another_package(self):
@@ -129,7 +129,7 @@ class FinalTests(unittest.TestCase):
                     pass
 
             raise RuntimeError('Should not go here')
-        except AssertionError:
+        except TypeError:
             pass
 
 
