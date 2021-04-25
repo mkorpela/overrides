@@ -77,23 +77,6 @@ Use ``@overrides`` to indicate that a subclass method should override a supercla
         def bar(self, y) -> int: # Raises, because the signature is not compatible.
             return y
 
-Use ``@final`` to indicate that a superclass method cannot be overriden.
-
-.. code-block:: python
-
-    from overrides import EnforceOverrides, final
-
-    class SuperClass(EnforceOveriddes):
-
-        @final
-        def foo(self):
-            return 1
-
-    class SubClass(SuperClass):
-
-        def foo(self): # Raises, because overriding a final method is forbidden.
-            return 2
-
 Use ``EnforceOverrides`` to require subclass methods that shadow superclass methods to be decorated 
 with ``@overrides``.
 
@@ -109,6 +92,23 @@ with ``@overrides``.
     class SubClass(SuperClass):
 
         def foo(self): # Raises, because @overrides is missing.
+            return 2
+
+Use ``@final`` to indicate that a superclass method cannot be overriden.
+
+.. code-block:: python
+
+    from overrides import EnforceOverrides, final
+
+    class SuperClass(EnforceOveriddes):
+
+        @final
+        def foo(self):
+            return 1
+
+    class SubClass(SuperClass):
+
+        def foo(self): # Raises, because overriding a final method is forbidden.
             return 2
 
 Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@overrides``.
