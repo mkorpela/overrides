@@ -108,6 +108,7 @@ Use ``@final`` to indicate that a superclass method cannot be overriden.
 
     class SubClass(SuperClass):
 
+        @overrides
         def foo(self): # Raises, because overriding a final method is forbidden.
             return 2
 
