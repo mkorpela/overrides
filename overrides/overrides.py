@@ -21,6 +21,7 @@ from typing import Callable, List, Tuple, TypeVar, Union
 
 __VERSION__ = "4.1.1"
 
+from overrides.signature import ensure_signature_is_compatible
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
@@ -63,6 +64,9 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
                     raise AssertionError('Method "%s" is finalized' % method.__name__)
             if not method.__doc__:
                 method.__doc__ = super_method.__doc__
+            #TODO: special methods signatures behave in odd ways -> do not check them
+            if not method.__name__.startswith("__"):
+                ensure_signature_is_compatible(method, super_method)
             return method
     raise AssertionError('No super class method found for "%s"' % method.__name__)
 

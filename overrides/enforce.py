@@ -1,7 +1,5 @@
 from abc import ABCMeta
 
-from overrides.signature import ensure_signature_is_compatible
-
 
 class EnforceOverridesMeta(ABCMeta):
     def __new__(mcls, name, bases, namespace, **kwargs):
@@ -36,7 +34,6 @@ class EnforceOverridesMeta(ABCMeta):
                     base_class_method,
                     base,
                 )
-                ensure_signature_is_compatible(base_class_method, value)
         return cls
 
     @staticmethod
