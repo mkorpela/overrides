@@ -27,10 +27,8 @@ def ensure_signature_is_compatible(
     :param super_callable: Function to check compatibility with.
     :param sub_callable: Function to check compatibility of.
     """
-    if (hasattr(super_callable, "__self__") and hasattr(super_callable, "__func__")):
-        super_callable = super_callable.__func__
-    if (hasattr(sub_callable, "__self__") and hasattr(sub_callable, "__func__")):
-        sub_callable = sub_callable.__func__
+    super_callable = _unbound_func(super_callable)
+    sub_callable = _unbound_func(sub_callable)
     super_sig = inspect.signature(super_callable)
     super_type_hints = get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
@@ -39,6 +37,12 @@ def ensure_signature_is_compatible(
     ensure_return_type_compatibility(super_type_hints, sub_type_hints)
     ensure_all_args_defined_in_sub(super_sig, sub_sig, super_type_hints, sub_type_hints)
     ensure_no_extra_args_in_sub(super_sig, sub_sig)
+
+
+def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
+    if hasattr(callable, "__self__") and hasattr(callable, "__func__"):
+        return callable.__func__
+    return callable
 
 
 def ensure_all_args_defined_in_sub(
