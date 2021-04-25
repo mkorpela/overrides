@@ -3,7 +3,7 @@ from inspect import Parameter
 from types import FunctionType
 from typing import Callable, TypeVar, Union, get_type_hints
 
-from typing_utils import issubtype
+from typing_utils import issubtype  # type: ignore
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
