@@ -81,7 +81,7 @@ Use ``@final`` to indicate that a superclass method cannot be overriden.
 
 .. code-block:: python
 
-    from overrides import final
+    from overrides import EnforceOverrides, final
 
     class SuperClass(EnforceOveriddes):
 
