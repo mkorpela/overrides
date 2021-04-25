@@ -34,9 +34,13 @@ def ensure_signature_is_compatible(
     sub_sig = inspect.signature(sub_callable)
     sub_type_hints = get_type_hints(sub_callable)
 
-    ensure_return_type_compatibility(super_type_hints, sub_type_hints)
-    ensure_all_args_defined_in_sub(super_sig, sub_sig, super_type_hints, sub_type_hints)
-    ensure_no_extra_args_in_sub(super_sig, sub_sig)
+    method_name = sub_callable.__name__
+
+    ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
+    ensure_all_args_defined_in_sub(
+        super_sig, sub_sig, super_type_hints, sub_type_hints, method_name
+    )
+    ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name)
 
 
 def _unbound_func(callable: _WrappedMethod) -> Tuple[_WrappedMethod, bool]:
@@ -46,7 +50,7 @@ def _unbound_func(callable: _WrappedMethod) -> Tuple[_WrappedMethod, bool]:
 
 
 def ensure_all_args_defined_in_sub(
-    super_sig, sub_sig, super_type_hints, sub_type_hints
+    super_sig, sub_sig, super_type_hints, sub_type_hints, method_name: str
 ):
     sub_has_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()
@@ -58,7 +62,7 @@ def ensure_all_args_defined_in_sub(
         if not is_param_defined_in_sub(
             name, sub_has_var_args, sub_has_var_kwargs, sub_sig, super_param
         ):
-            raise TypeError(f"`{name}` is not present.")
+            raise TypeError(f"{method_name}: `{name}` is not present.")
         elif (
             name in sub_sig.parameters
             and super_param.kind != Parameter.VAR_POSITIONAL
@@ -78,18 +82,22 @@ def ensure_all_args_defined_in_sub(
                     and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
                 )
             ):
-                raise TypeError(f"`{name}` is not `{super_param.kind.description}`")
+                raise TypeError(
+                    f"{method_name}: `{name}` is not `{super_param.kind.description}`"
+                )
             elif (
                 super_index != sub_index and super_param.kind != Parameter.KEYWORD_ONLY
             ):
-                raise TypeError(f"`{name}` is not parameter `{super_index}`")
+                raise TypeError(
+                    f"{method_name}: `{name}` is not parameter `{super_index}`"
+                )
             elif (
                 name in super_type_hints
                 and name in sub_type_hints
                 and not issubtype(super_type_hints[name], sub_type_hints[name])
             ):
                 raise TypeError(
-                    f"`{name} must be a supertype of `{super_param.annotation}`"
+                    f"`{method_name}: {name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
                 )
 
 
@@ -110,7 +118,7 @@ def is_param_defined_in_sub(
     )
 
 
-def ensure_no_extra_args_in_sub(super_sig, sub_sig):
+def ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name: str):
     super_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
     )
@@ -129,15 +137,13 @@ def ensure_no_extra_args_in_sub(super_sig, sub_sig):
                 sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD and super_var_args
             )
         ):
-            raise TypeError(f"`{name}` is not a valid parameter.")
+            raise TypeError(f"{method_name}: `{name}` is not a valid parameter.")
 
 
-def ensure_return_type_compatibility(super_type_hints: Dict, sub_type_hints: Dict):
+def ensure_return_type_compatibility(
+    super_type_hints: Dict, sub_type_hints: Dict, method_name: str
+):
     super_return = super_type_hints.get("return", None)
     sub_return = sub_type_hints.get("return", None)
-    if (
-        not issubtype(sub_return, super_return)
-    ):
-        raise TypeError(
-            f"`{sub_return}` is not a `{super_return}`."
-        )
+    if not issubtype(sub_return, super_return):
+        raise TypeError(f"{method_name}: `{sub_return}` is not a `{super_return}`.")
