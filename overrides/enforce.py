@@ -130,7 +130,9 @@ class EnforceOverridesMeta(ABCMeta):
         # Ignore any methods defined on the metaclass when enforcing overrides.
         for method in dir(mcls):
             if not method.startswith("__") and method != "mro":
-                setattr(getattr(mcls, method), "__ignored__", True)
+                value = getattr(mcls, method)
+                if not isinstance(value, (bool, str, int, float, tuple, list, dict)):
+                    setattr(getattr(mcls, method), "__ignored__", True)
 
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         for name, value in namespace.items():
