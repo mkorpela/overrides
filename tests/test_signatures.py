@@ -1,6 +1,6 @@
 from typing import Union
 
-from overrides import overrides, overrides_ignore_signature
+from overrides import overrides
 
 
 class SuperbClass:
@@ -39,7 +39,7 @@ class NormalMethodOverrider(SuperbClass):
 
 
 class OverridesWithSignatureIgnore(SuperbClass):
-    @overrides_ignore_signature
+    @overrides(check_signature=False)
     def normal_method(self, x: int) -> bool:
         return x % 2 == 1
 

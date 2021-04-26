@@ -15,9 +15,10 @@
 #
 
 import dis
+import functools
 import sys
 from types import FunctionType
-from typing import Callable, List, Tuple, TypeVar, Union
+from typing import Any, Callable, List, Tuple, TypeVar, Union
 
 __VERSION__ = "4.1.2"
 
@@ -26,7 +27,11 @@ from overrides.signature import ensure_signature_is_compatible
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
 
-def overrides(method: _WrappedMethod) -> _WrappedMethod:
+def overrides(
+    method: _WrappedMethod = None,
+    *,
+    check_signature: bool = True,
+) -> Any:
     """Decorator to indicate that the decorated method overrides a method in
     superclass.
     The decorator code is executed while loading class. Using this method
@@ -54,19 +59,17 @@ def overrides(method: _WrappedMethod) -> _WrappedMethod:
     :return  method with possibly added (if the method doesn't have one)
         docstring from super class
     """
-    setattr(method, "__override__", True)
-    for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
-        if hasattr(super_class, method.__name__):
-            _validate_method(method, super_class, True)
-            return method
-    raise TypeError(f"{method.__name__}: No super class method found")
+    if method:
+        return _overrides(method, check_signature)
+    else:
+        return functools.partial(overrides, check_signature=check_signature)
 
 
-def overrides_ignore_signature(method: _WrappedMethod) -> _WrappedMethod:
+def _overrides(method: _WrappedMethod, check_signature: bool) -> _WrappedMethod:
     setattr(method, "__override__", True)
-    for super_class in _get_base_classes(sys._getframe(2), method.__globals__):
+    for super_class in _get_base_classes(sys._getframe(3), method.__globals__):
         if hasattr(super_class, method.__name__):
-            _validate_method(method, super_class, False)
+            _validate_method(method, super_class, check_signature)
             return method
     raise TypeError(f"{method.__name__}: No super class method found")
 
