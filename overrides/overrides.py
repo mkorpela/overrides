@@ -19,7 +19,7 @@ import sys
 from types import FunctionType
 from typing import Callable, List, Tuple, TypeVar, Union
 
-__VERSION__ = "4.1.1"
+__VERSION__ = "4.1.2"
 
 from overrides.signature import ensure_signature_is_compatible
 
