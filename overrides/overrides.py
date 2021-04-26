@@ -105,7 +105,7 @@ def _validate_method(method, super_class, check_signature):
         and not method.__name__.startswith("__")
         and not isinstance(super_method, property)
     ):
-        ensure_signature_is_compatible(super_method, method, is_method=True)
+        ensure_signature_is_compatible(super_method, method)
 
 
 def _get_base_classes(frame, namespace):

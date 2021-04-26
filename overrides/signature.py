@@ -10,8 +10,7 @@ _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
 def ensure_signature_is_compatible(
     super_callable: _WrappedMethod,
-    sub_callable: _WrappedMethod,
-    is_method: bool = False,
+    sub_callable: _WrappedMethod
 ) -> None:
     """Ensure that the signature of `sub_callable` is compatible with the signature of `super_callable`.
 
@@ -37,7 +36,7 @@ def ensure_signature_is_compatible(
 
     method_name = sub_callable.__name__
 
-    check_first_parameter = not is_method or isinstance(sub_callable, staticmethod)
+    check_first_parameter = is_bound_sub and is_bound_super
 
     ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
     ensure_all_args_defined_in_sub(
@@ -84,6 +83,7 @@ def ensure_all_args_defined_in_sub(
                     super_param.kind == Parameter.KEYWORD_ONLY
                     and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
                 )
+                and (sub_index > 0 or check_first_parameter)
             ):
                 raise TypeError(
                     f"{method_name}: `{name}` is not `{super_param.kind.description}`"

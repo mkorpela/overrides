@@ -62,6 +62,17 @@ class SelfTypedOverride(SuperbClass):
         return None
 
 
+class A:
+    def foo(self: int):
+        pass
+
+
+class B(A):
+    @overrides
+    def foo(self: str):
+        pass
+
+
 def test_that_this_file_is_ok():
     pass
 
