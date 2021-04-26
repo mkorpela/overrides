@@ -31,6 +31,7 @@ def overrides(
     method: _WrappedMethod = None,
     *,
     check_signature: bool = True,
+    check_at_runtime: bool = False,
 ) -> Any:
     """Decorator to indicate that the decorated method overrides a method in
     superclass.
@@ -55,22 +56,39 @@ def overrides(
         def method(self):
             return 1
 
+    :param check_signature: Whether or not to check the signature of the overridden method.
+    :param check_at_runtime: Whether or not to check the overridden method at runtime.
     :raises  AssertionError if no match in super classes for the method name
     :return  method with possibly added (if the method doesn't have one)
         docstring from super class
     """
     if method:
-        return _overrides(method, check_signature)
+        return _overrides(method, check_signature, check_at_runtime)
     else:
-        return functools.partial(overrides, check_signature=check_signature)
+        return functools.partial(
+            overrides, 
+            check_signature=check_signature,
+            check_at_runtime=check_at_runtime)
 
 
-def _overrides(method: _WrappedMethod, check_signature: bool) -> _WrappedMethod:
+def _overrides(
+    method: _WrappedMethod, 
+    check_signature: bool, 
+    check_at_runtime: bool,
+) -> _WrappedMethod:
     setattr(method, "__override__", True)
     for super_class in _get_base_classes(sys._getframe(3), method.__globals__):
         if hasattr(super_class, method.__name__):
-            _validate_method(method, super_class, check_signature)
-            return method
+            if check_at_runtime:
+                @functools.wraps(method)
+                def wrapper(*args, **kwargs):
+                    _validate_method(method, super_class, check_signature)
+                    return method(*args, **kwargs)
+                
+                return wrapper  # type: ignore
+            else:
+                _validate_method(method, super_class, check_signature)
+                return method
     raise TypeError(f"{method.__name__}: No super class method found")
 
 

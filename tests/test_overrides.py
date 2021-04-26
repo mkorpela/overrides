@@ -55,6 +55,12 @@ class SubclassOfInt(int):
         return "subclass of int"
 
 
+class CheckAtRuntime(SuperClass):
+    @overrides(check_at_runtime=True)
+    def some_method(self, x):
+        pass
+
+
 class OverridesTests(unittest.TestCase):
     def test_overrides_passes_for_same_package_superclass(self):
         sub = SubClass()
@@ -91,6 +97,10 @@ class OverridesTests(unittest.TestCase):
         genericsub = SubSubClassOfGeneric()
         self.assertEqual(genericsub.some_method(), 17)
         self.assertEqual(genericsub.some_method.__doc__, "Generic sub class.")
+
+    def test_overrides_check_at_runtime(self):
+        with self.assertRaises(TypeError):
+            CheckAtRuntime().some_method(1)
 
 
 if __name__ == "__main__":
