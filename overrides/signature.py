@@ -11,6 +11,7 @@ _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 def ensure_signature_is_compatible(
     super_callable: _WrappedMethod,
     sub_callable: _WrappedMethod,
+    is_method: bool = False,
 ) -> None:
     """Ensure that the signature of `sub_callable` is compatible with the signature of `super_callable`.
 
@@ -36,9 +37,11 @@ def ensure_signature_is_compatible(
 
     method_name = sub_callable.__name__
 
+    check_first_parameter = not is_method or isinstance(sub_callable, staticmethod)
+
     ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
     ensure_all_args_defined_in_sub(
-        super_sig, sub_sig, super_type_hints, sub_type_hints, method_name
+        super_sig, sub_sig, super_type_hints, sub_type_hints, check_first_parameter, method_name
     )
     ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name)
 
@@ -50,7 +53,7 @@ def _unbound_func(callable: _WrappedMethod) -> Tuple[_WrappedMethod, bool]:
 
 
 def ensure_all_args_defined_in_sub(
-    super_sig, sub_sig, super_type_hints, sub_type_hints, method_name: str
+    super_sig, sub_sig, super_type_hints, sub_type_hints, check_first_parameter, method_name: str
 ):
     sub_has_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()
@@ -95,6 +98,7 @@ def ensure_all_args_defined_in_sub(
                 name in super_type_hints
                 and name in sub_type_hints
                 and not issubtype(super_type_hints[name], sub_type_hints[name])
+                and (sub_index > 0 or check_first_parameter)
             ):
                 raise TypeError(
                     f"`{method_name}: {name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
