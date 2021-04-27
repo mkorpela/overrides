@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Type, Union
 
 from overrides import overrides
 
@@ -16,6 +16,13 @@ class SuperbClass:
 
     def normal_method(self, x: int, y: str = "hello", *args, **kwargs) -> bool:
         return x == 1 or y == "bar" or len(args) == 3 or "zoo" in kwargs
+
+    def self_typed_method(self: "SuperbClass") -> "SuperbClass":
+        return self
+
+    @classmethod
+    def self_typed_class_method(cls: "Type[SuperbClass]") -> None:
+        return None
 
 
 class ClassMethodOverrider(SuperbClass):
@@ -44,5 +51,32 @@ class OverridesWithSignatureIgnore(SuperbClass):
         return x % 2 == 1
 
 
+class SelfTypedOverride(SuperbClass):
+    @overrides(check_at_runtime=True)
+    def self_typed_method(self: "SelfTypedOverride") -> "SelfTypedOverride":
+        return self
+
+    @classmethod
+    @overrides(check_at_runtime=True)
+    def self_typed_class_method(cls: "Type[SelfTypedOverride]") -> None:
+        return None
+
+
+class A:
+    def foo(self: int):
+        pass
+
+
+class B(A):
+    @overrides
+    def foo(self: str):
+        pass
+
+
 def test_that_this_file_is_ok():
     pass
+
+
+def test_self_typed_overrides():
+    SelfTypedOverride().self_typed_method()
+    SelfTypedOverride().self_typed_class_method()

@@ -6,11 +6,13 @@ from typing import Callable, TypeVar, Union, get_type_hints, Tuple, Dict
 from typing_utils import issubtype  # type: ignore
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
+_WrappedMethod2 = TypeVar("_WrappedMethod2", bound=Union[FunctionType, Callable])
 
 
 def ensure_signature_is_compatible(
     super_callable: _WrappedMethod,
-    sub_callable: _WrappedMethod,
+    sub_callable: _WrappedMethod2,
+    is_static: bool = False,
 ) -> None:
     """Ensure that the signature of `sub_callable` is compatible with the signature of `super_callable`.
 
@@ -26,9 +28,10 @@ def ensure_signature_is_compatible(
 
     :param super_callable: Function to check compatibility with.
     :param sub_callable: Function to check compatibility of.
+    :param is_static: True if staticmethod and should check first argument.
     """
-    super_callable, is_bound_super = _unbound_func(super_callable)
-    sub_callable, is_bound_sub = _unbound_func(sub_callable)
+    super_callable = _unbound_func(super_callable)
+    sub_callable = _unbound_func(sub_callable)
     super_sig = inspect.signature(super_callable)
     super_type_hints = get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
@@ -38,19 +41,24 @@ def ensure_signature_is_compatible(
 
     ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
     ensure_all_args_defined_in_sub(
-        super_sig, sub_sig, super_type_hints, sub_type_hints, method_name
+        super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
     )
-    ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name)
+    ensure_no_extra_args_in_sub(super_sig, sub_sig, is_static, method_name)
 
 
-def _unbound_func(callable: _WrappedMethod) -> Tuple[_WrappedMethod, bool]:
+def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
     if hasattr(callable, "__self__") and hasattr(callable, "__func__"):
-        return callable.__func__, True
-    return callable, False
+        return callable.__func__
+    return callable
 
 
 def ensure_all_args_defined_in_sub(
-    super_sig, sub_sig, super_type_hints, sub_type_hints, method_name: str
+    super_sig,
+    sub_sig,
+    super_type_hints,
+    sub_type_hints,
+    check_first_parameter: bool,
+    method_name: str,
 ):
     sub_has_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()
@@ -61,7 +69,7 @@ def ensure_all_args_defined_in_sub(
     for super_index, (name, super_param) in enumerate(super_sig.parameters.items()):
         if not is_param_defined_in_sub(
             name, sub_has_var_args, sub_has_var_kwargs, sub_sig, super_param
-        ):
+        ) and (super_index > 0 or check_first_parameter):
             raise TypeError(f"{method_name}: `{name}` is not present.")
         elif (
             name in sub_sig.parameters
@@ -81,6 +89,7 @@ def ensure_all_args_defined_in_sub(
                     super_param.kind == Parameter.KEYWORD_ONLY
                     and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
                 )
+                and (sub_index > 0 or check_first_parameter)
             ):
                 raise TypeError(
                     f"{method_name}: `{name}` is not `{super_param.kind.description}`"
@@ -95,6 +104,7 @@ def ensure_all_args_defined_in_sub(
                 name in super_type_hints
                 and name in sub_type_hints
                 and not issubtype(super_type_hints[name], sub_type_hints[name])
+                and (sub_index > 0 or check_first_parameter)
             ):
                 raise TypeError(
                     f"`{method_name}: {name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
@@ -118,14 +128,16 @@ def is_param_defined_in_sub(
     )
 
 
-def ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name: str):
+def ensure_no_extra_args_in_sub(
+    super_sig, sub_sig, check_first_parameter: bool, method_name: str
+):
     super_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
     )
     super_var_kwargs = any(
         p.kind == Parameter.VAR_KEYWORD for p in super_sig.parameters.values()
     )
-    for name, sub_param in sub_sig.parameters.items():
+    for sub_index, (name, sub_param) in enumerate(sub_sig.parameters.items()):
         if (
             name not in super_sig.parameters
             and sub_param.default == Parameter.empty
@@ -136,6 +148,7 @@ def ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name: str):
             and not (
                 sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD and super_var_args
             )
+            and (sub_index > 0 or check_first_parameter)
         ):
             raise TypeError(f"{method_name}: `{name}` is not a valid parameter.")
 

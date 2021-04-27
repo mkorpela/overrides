@@ -21,6 +21,10 @@ class SubSubClassOfGeneric(SubClassOfGeneric["SubSubClassOfGeneric"]):
 
 
 class SuperClass(object):
+    @staticmethod
+    def this_is_static(x, y, z):
+        pass
+
     def some_method(self):
         """Super Class Docs"""
         return "super"
@@ -61,6 +65,13 @@ class CheckAtRuntime(SuperClass):
         pass
 
 
+class StaticMethodOverridePass(SuperClass):
+    @staticmethod
+    @overrides
+    def this_is_static(x, y, z, *args):
+        pass
+
+
 class OverridesTests(unittest.TestCase):
     def test_overrides_passes_for_same_package_superclass(self):
         sub = SubClass()
@@ -83,6 +94,19 @@ class OverridesTests(unittest.TestCase):
             class ShouldFail(SuperClass):
                 @overrides
                 def somo_method(self):
+                    pass
+
+            raise RuntimeError("Should not go here")
+        except TypeError:
+            pass
+
+    def test_static_method(self):
+        try:
+
+            class StaticMethodOverrideFail(SuperClass):
+                @staticmethod
+                @overrides
+                def this_is_static(k, y, z):
                     pass
 
             raise RuntimeError("Should not go here")
