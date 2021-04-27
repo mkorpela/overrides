@@ -121,14 +121,14 @@ Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@over
     class SuperClass:
 
         @staticmethod
-        def foo(self):
+        def foo(x):
             return 1
 
     class SubClass(SuperClass):
 
         @staticmethod
         @overrides
-        def foo(self):
+        def foo(x):
             return 2
 
 Contributors
