@@ -6,11 +6,13 @@ from typing import Callable, TypeVar, Union, get_type_hints, Tuple, Dict
 from typing_utils import issubtype  # type: ignore
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
+_WrappedMethod2 = TypeVar("_WrappedMethod2", bound=Union[FunctionType, Callable])
 
 
 def ensure_signature_is_compatible(
     super_callable: _WrappedMethod,
-    sub_callable: _WrappedMethod
+    sub_callable: _WrappedMethod2,
+    is_static: bool = False,
 ) -> None:
     """Ensure that the signature of `sub_callable` is compatible with the signature of `super_callable`.
 
@@ -26,9 +28,10 @@ def ensure_signature_is_compatible(
 
     :param super_callable: Function to check compatibility with.
     :param sub_callable: Function to check compatibility of.
+    :param is_static: True if staticmethod and should check first argument.
     """
-    super_callable, is_bound_super = _unbound_func(super_callable)
-    sub_callable, is_bound_sub = _unbound_func(sub_callable)
+    super_callable = _unbound_func(super_callable)
+    sub_callable = _unbound_func(sub_callable)
     super_sig = inspect.signature(super_callable)
     super_type_hints = get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
@@ -36,23 +39,26 @@ def ensure_signature_is_compatible(
 
     method_name = sub_callable.__name__
 
-    check_first_parameter = is_bound_sub and is_bound_super
-
     ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
     ensure_all_args_defined_in_sub(
-        super_sig, sub_sig, super_type_hints, sub_type_hints, check_first_parameter, method_name
+        super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
     )
     ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name)
 
 
-def _unbound_func(callable: _WrappedMethod) -> Tuple[_WrappedMethod, bool]:
+def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
     if hasattr(callable, "__self__") and hasattr(callable, "__func__"):
-        return callable.__func__, True
-    return callable, False
+        return callable.__func__
+    return callable
 
 
 def ensure_all_args_defined_in_sub(
-    super_sig, sub_sig, super_type_hints, sub_type_hints, check_first_parameter, method_name: str
+    super_sig,
+    sub_sig,
+    super_type_hints,
+    sub_type_hints,
+    check_first_parameter,
+    method_name: str,
 ):
     sub_has_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()

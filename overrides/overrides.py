@@ -16,6 +16,7 @@
 
 import dis
 import functools
+import inspect
 import sys
 from types import FunctionType
 from typing import Any, Callable, List, Tuple, TypeVar, Union
@@ -66,25 +67,27 @@ def overrides(
         return _overrides(method, check_signature, check_at_runtime)
     else:
         return functools.partial(
-            overrides, 
+            overrides,
             check_signature=check_signature,
-            check_at_runtime=check_at_runtime)
+            check_at_runtime=check_at_runtime,
+        )
 
 
 def _overrides(
-    method: _WrappedMethod, 
-    check_signature: bool, 
+    method: _WrappedMethod,
+    check_signature: bool,
     check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
     for super_class in _get_base_classes(sys._getframe(3), method.__globals__):
         if hasattr(super_class, method.__name__):
             if check_at_runtime:
+
                 @functools.wraps(method)
                 def wrapper(*args, **kwargs):
                     _validate_method(method, super_class, check_signature)
                     return method(*args, **kwargs)
-                
+
                 return wrapper  # type: ignore
             else:
                 _validate_method(method, super_class, check_signature)
@@ -94,6 +97,9 @@ def _overrides(
 
 def _validate_method(method, super_class, check_signature):
     super_method = getattr(super_class, method.__name__)
+    is_static = isinstance(
+        inspect.getattr_static(super_class, method.__name__), staticmethod
+    )
     if hasattr(super_method, "__finalized__"):
         finalized = getattr(super_method, "__finalized__")
         if finalized:
@@ -105,7 +111,7 @@ def _validate_method(method, super_class, check_signature):
         and not method.__name__.startswith("__")
         and not isinstance(super_method, property)
     ):
-        ensure_signature_is_compatible(super_method, method)
+        ensure_signature_is_compatible(super_method, method, is_static)
 
 
 def _get_base_classes(frame, namespace):
@@ -138,7 +144,7 @@ def op_stream(code, max):
 
 
 def _get_base_class_names(frame):
-    """ Get baseclass names from the code object """
+    """Get baseclass names from the code object"""
     co, lasti = frame.f_code, frame.f_lasti
     code = co.co_code
 

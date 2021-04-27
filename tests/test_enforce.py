@@ -123,60 +123,60 @@ class EnforceTests(unittest.TestCase):
                     pass
 
     def test_ensure_compatible_when_compatible(self):
-        def sup(self,a, /, b: str, c: int, *, d, e, **kwargs) -> object:
+        def sup(self, a, /, b: str, c: int, *, d, e, **kwargs) -> object:
             pass
 
-        def sub(self,
-            a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
+        def sub(
+            self, a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
         ) -> str:
             pass
 
         ensure_signature_is_compatible(sup, sub)
 
     def test_ensure_compatible_when_type_hints_are_strings(self):
-        def sup(self,x: "str") -> "object":
+        def sup(self, x: "str") -> "object":
             pass
 
-        def sub(self,x: "object") -> "str":
+        def sub(self, x: "object") -> "str":
             pass
 
         ensure_signature_is_compatible(sup, sub)
 
     def test_ensure_compatible_when_return_types_are_incompatible(self):
-        def sup(self,x) -> int:
+        def sup(self, x) -> int:
             pass
 
-        def sub(self,x) -> str:
+        def sub(self, x) -> str:
             pass
 
         with self.assertRaises(TypeError):
             ensure_signature_is_compatible(sup, sub)
 
     def test_ensure_compatible_when_parameter_positions_are_incompatible(self):
-        def sup(self,x, y):
+        def sup(self, x, y):
             pass
 
-        def sub(self,y, x):
+        def sub(self, y, x):
             pass
 
         with self.assertRaises(TypeError):
             ensure_signature_is_compatible(sup, sub)
 
     def test_ensure_compatible_when_parameter_types_are_incompatible(self):
-        def sup(self,x: object):
+        def sup(self, x: object):
             pass
 
-        def sub(self,y: str):
+        def sub(self, y: str):
             pass
 
         with self.assertRaises(TypeError):
             ensure_signature_is_compatible(sup, sub)
 
     def test_ensure_compatible_when_parameter_kinds_are_incompatible(self):
-        def sup(self,x):
+        def sup(self, x):
             pass
 
-        def sub(self,*, x):
+        def sub(self, *, x):
             pass
 
         with self.assertRaises(TypeError):
@@ -307,3 +307,64 @@ class EnforceTests(unittest.TestCase):
         ensure_signature_is_compatible(superb, optional_positional_arg)
         # superb() => optional_kw_only_arg()
         ensure_signature_is_compatible(superb, optional_kw_only_arg)
+
+    def test_signatures_when_self_mismach(self):
+        class A:
+            def foo(self, x: int):
+                pass
+
+        class B:
+            def bar(self, x: int):
+                pass
+
+        class C:
+            def zoo(self, x: str):
+                pass
+
+        ensure_signature_is_compatible(A().foo, B().bar)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A().foo, C().zoo)
+
+        ensure_signature_is_compatible(A.foo, B().bar)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A.foo, C().zoo)
+
+        ensure_signature_is_compatible(A.foo, B.bar)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A.foo, C.zoo)
+
+        ensure_signature_is_compatible(A().foo, B.bar)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A().foo, C.zoo)
+
+    def test_signature_with_static_method(self):
+        class A:
+            @staticmethod
+            def foo(x: int):
+                pass
+
+        class B:
+            @staticmethod
+            def bar(x: int):
+                pass
+
+        class C:
+            @staticmethod
+            def zoo(x: str):
+                pass
+
+        ensure_signature_is_compatible(A().foo, B().bar, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A().foo, C().zoo, True)
+
+        ensure_signature_is_compatible(A.foo, B().bar, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A.foo, C().zoo, True)
+
+        ensure_signature_is_compatible(A.foo, B.bar, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A.foo, C.zoo, True)
+
+        ensure_signature_is_compatible(A().foo, B.bar, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(A().foo, C.zoo, True)

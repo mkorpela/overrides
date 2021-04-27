@@ -16,7 +16,7 @@ class SuperbClass:
 
     def normal_method(self, x: int, y: str = "hello", *args, **kwargs) -> bool:
         return x == 1 or y == "bar" or len(args) == 3 or "zoo" in kwargs
-    
+
     def self_typed_method(self: "SuperbClass") -> "SuperbClass":
         return self
 
