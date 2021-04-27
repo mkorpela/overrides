@@ -314,7 +314,7 @@ class EnforceTests(unittest.TestCase):
                 pass
 
         class B:
-            def bar(self, x: int):
+            def bar(me, x: int):
                 pass
 
         class C:

@@ -43,7 +43,7 @@ def ensure_signature_is_compatible(
     ensure_all_args_defined_in_sub(
         super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
     )
-    ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name)
+    ensure_no_extra_args_in_sub(super_sig, sub_sig, is_static, method_name)
 
 
 def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
@@ -57,7 +57,7 @@ def ensure_all_args_defined_in_sub(
     sub_sig,
     super_type_hints,
     sub_type_hints,
-    check_first_parameter,
+    check_first_parameter: bool,
     method_name: str,
 ):
     sub_has_var_args = any(
@@ -69,7 +69,7 @@ def ensure_all_args_defined_in_sub(
     for super_index, (name, super_param) in enumerate(super_sig.parameters.items()):
         if not is_param_defined_in_sub(
             name, sub_has_var_args, sub_has_var_kwargs, sub_sig, super_param
-        ):
+        ) and (super_index > 0 or check_first_parameter):
             raise TypeError(f"{method_name}: `{name}` is not present.")
         elif (
             name in sub_sig.parameters
@@ -128,14 +128,14 @@ def is_param_defined_in_sub(
     )
 
 
-def ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name: str):
+def ensure_no_extra_args_in_sub(super_sig, sub_sig, check_first_parameter: bool, method_name: str):
     super_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
     )
     super_var_kwargs = any(
         p.kind == Parameter.VAR_KEYWORD for p in super_sig.parameters.values()
     )
-    for name, sub_param in sub_sig.parameters.items():
+    for sub_index, (name, sub_param) in enumerate(sub_sig.parameters.items()):
         if (
             name not in super_sig.parameters
             and sub_param.default == Parameter.empty
@@ -146,6 +146,7 @@ def ensure_no_extra_args_in_sub(super_sig, sub_sig, method_name: str):
             and not (
                 sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD and super_var_args
             )
+            and (sub_index > 0 or check_first_parameter)
         ):
             raise TypeError(f"{method_name}: `{name}` is not a valid parameter.")
 
