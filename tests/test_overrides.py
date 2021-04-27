@@ -21,7 +21,6 @@ class SubSubClassOfGeneric(SubClassOfGeneric["SubSubClassOfGeneric"]):
 
 
 class SuperClass(object):
-
     @staticmethod
     def this_is_static(x, y, z):
         pass

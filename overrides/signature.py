@@ -128,7 +128,9 @@ def is_param_defined_in_sub(
     )
 
 
-def ensure_no_extra_args_in_sub(super_sig, sub_sig, check_first_parameter: bool, method_name: str):
+def ensure_no_extra_args_in_sub(
+    super_sig, sub_sig, check_first_parameter: bool, method_name: str
+):
     super_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
     )
