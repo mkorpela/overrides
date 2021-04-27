@@ -9,6 +9,16 @@ _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 _WrappedMethod2 = TypeVar("_WrappedMethod2", bound=Union[FunctionType, Callable])
 
 
+def _issubtype(left, right):
+    if isinstance(left, TypeVar):
+        return True
+    if right is None:
+        return left is None
+    if isinstance(right, TypeVar):
+        return True
+    return issubtype(left, right)
+
+
 def ensure_signature_is_compatible(
     super_callable: _WrappedMethod,
     sub_callable: _WrappedMethod2,
@@ -103,7 +113,7 @@ def ensure_all_args_defined_in_sub(
             elif (
                 name in super_type_hints
                 and name in sub_type_hints
-                and not issubtype(super_type_hints[name], sub_type_hints[name])
+                and not _issubtype(super_type_hints[name], sub_type_hints[name])
                 and (sub_index > 0 or check_first_parameter)
             ):
                 raise TypeError(
@@ -158,5 +168,5 @@ def ensure_return_type_compatibility(
 ):
     super_return = super_type_hints.get("return", None)
     sub_return = sub_type_hints.get("return", None)
-    if not issubtype(sub_return, super_return):
-        raise TypeError(f"{method_name}: `{sub_return}` is not a `{super_return}`.")
+    if not _issubtype(sub_return, super_return) and super_return is not None:
+        raise TypeError(f"{method_name}: return type `{sub_return}` is not a `{super_return}`.")

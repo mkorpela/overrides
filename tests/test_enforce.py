@@ -1,5 +1,5 @@
 import unittest
-from typing import Union, Optional
+from typing import Union, Optional, TypeVar
 
 from overrides import overrides, final, EnforceOverrides
 from overrides.signature import ensure_signature_is_compatible
@@ -81,7 +81,6 @@ class EnforceTests(unittest.TestCase):
 
     def test_enforcing_when_incompatible(self):
         with self.assertRaises(TypeError):
-
             class Incompatible(Enforcing):
                 @overrides
                 def nonfinal1(self, param: str):
@@ -117,7 +116,6 @@ class EnforceTests(unittest.TestCase):
                 pass
 
         with self.assertRaises(AssertionError):
-
             class SubClass(MetaClassMethodOverrider):
                 def register(self):
                     pass
@@ -127,7 +125,7 @@ class EnforceTests(unittest.TestCase):
             pass
 
         def sub(
-            self, a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
+                self, a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
         ) -> str:
             pass
 
@@ -368,3 +366,28 @@ class EnforceTests(unittest.TestCase):
         ensure_signature_is_compatible(A().foo, B.bar, True)
         with self.assertRaises(TypeError):
             ensure_signature_is_compatible(A().foo, C.zoo, True)
+
+    def test_typevar_in_signature(self):
+        T = TypeVar("T")
+        K = TypeVar("K")
+
+        def typevarred(t: T) -> K:
+            pass
+
+        def typed(t: str) -> int:
+            pass
+
+        def untyped(t):
+            pass
+
+        def return_typed(t) -> int:
+            pass
+
+        ensure_signature_is_compatible(typevarred, untyped, True)
+        ensure_signature_is_compatible(typevarred, typed, True)
+        ensure_signature_is_compatible(untyped, typevarred, True)
+        ensure_signature_is_compatible(typed, typevarred, True)
+        ensure_signature_is_compatible(untyped, return_typed, True)
+        ensure_signature_is_compatible(untyped, typed, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(typed, untyped, True)
