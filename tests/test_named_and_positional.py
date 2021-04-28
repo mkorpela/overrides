@@ -17,6 +17,12 @@ def test_should_pass():
             print(y)
             super().methoda(**kwargs)
 
+def test_should_also_pass():
+    class B(A):
+        @overrides
+        def methoda(self, z=1, x=1, **kwargs):
+            pass
+
 def test_can_not_override_with_positional_only():
     try:
         class C(A):

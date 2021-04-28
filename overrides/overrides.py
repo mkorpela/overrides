@@ -92,7 +92,7 @@ def _overrides(
             else:
                 _validate_method(method, super_class, check_signature)
                 return method
-    raise TypeError(f"{method.__name__}: No super class method found")
+    raise TypeError(f"{method.__qualname__}: No super class method found")
 
 
 def _validate_method(method, super_class, check_signature):

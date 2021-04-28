@@ -159,8 +159,18 @@ class EnforceTests(unittest.TestCase):
         def sub(self, y, x):
             pass
 
+        def sub2(self, z, x):
+            pass
+
+        def sub3(self, y, z):
+            pass
+
         with self.assertRaises(TypeError):
             ensure_signature_is_compatible(sup, sub)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(sup, sub2)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(sup, sub3)
 
     def test_ensure_compatible_when_parameter_types_are_incompatible(self):
         def sup(self, x: object):

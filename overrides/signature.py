@@ -47,7 +47,7 @@ def ensure_signature_is_compatible(
     sub_sig = inspect.signature(sub_callable)
     sub_type_hints = get_type_hints(sub_callable)
 
-    method_name = sub_callable.__name__
+    method_name = sub_callable.__qualname__
 
     ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
     ensure_all_kwargs_defined_in_sub(
@@ -99,10 +99,10 @@ def ensure_all_kwargs_defined_in_sub(
                     f"{method_name}: `{name}` is not `{super_param.kind.description}`"
                 )
             elif (
-                super_index != sub_index and super_param.kind != Parameter.KEYWORD_ONLY
+                super_index > sub_index and super_param.kind != Parameter.KEYWORD_ONLY
             ):
                 raise TypeError(
-                    f"{method_name}: `{name}` is not parameter `{super_index}`"
+                    f"{method_name}: `{name}` is not parameter at index `{super_index}`"
                 )
             elif (
                 name in super_type_hints
