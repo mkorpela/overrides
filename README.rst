@@ -34,6 +34,8 @@ This opens the door for subtle problems as class hierarchies evolve over time. F
 4. A method of a superclass that is overridden by a subclass but the signature of the overridden
    method is incompatible with that of the inherited one.
 
+These can be only checked by explicitly marking method override in the code.
+
 Python also has no standard mechanism by which to inherit docstrings in overridden methods. Because 
 most standard linters (e.g., flake8) have rules that require all public methods to have a docstring, 
 this inevitably leads to a proliferation of ``See parent class for usage`` docstrings on overridden
