@@ -50,7 +50,10 @@ def ensure_signature_is_compatible(
     method_name = sub_callable.__name__
 
     ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
-    ensure_all_args_defined_in_sub(
+    ensure_all_kwargs_defined_in_sub(
+        super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
+    )
+    ensure_all_positional_args_defined_in_sub(
         super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
     )
     ensure_no_extra_args_in_sub(super_sig, sub_sig, is_static, method_name)
@@ -62,7 +65,7 @@ def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
     return callable
 
 
-def ensure_all_args_defined_in_sub(
+def ensure_all_kwargs_defined_in_sub(
     super_sig,
     sub_sig,
     super_type_hints,
@@ -70,36 +73,27 @@ def ensure_all_args_defined_in_sub(
     check_first_parameter: bool,
     method_name: str,
 ):
-    sub_has_var_args = any(
-        p.kind == Parameter.VAR_POSITIONAL for p in sub_sig.parameters.values()
-    )
     sub_has_var_kwargs = any(
         p.kind == Parameter.VAR_KEYWORD for p in sub_sig.parameters.values()
     )
     for super_index, (name, super_param) in enumerate(super_sig.parameters.items()):
+        if super_index == 0 and not check_first_parameter:
+            continue
+        if super_param.kind == Parameter.VAR_POSITIONAL:
+            continue
+        if super_param.kind == Parameter.POSITIONAL_ONLY:
+            continue
         if not is_param_defined_in_sub(
-            name, sub_has_var_args, sub_has_var_kwargs, sub_sig, super_param
-        ) and (super_index > 0 or check_first_parameter):
-            raise TypeError(f"{method_name}: `{name}` is not present.")
-        elif (
-            name in sub_sig.parameters
-            and super_param.kind != Parameter.VAR_POSITIONAL
-            and super_param.kind != Parameter.VAR_KEYWORD
+            name, True, sub_has_var_kwargs, sub_sig, super_param
         ):
+            raise TypeError(f"{method_name}: `{name}` is not present.")
+        elif name in sub_sig.parameters and super_param.kind != Parameter.VAR_KEYWORD:
             sub_index = list(sub_sig.parameters.keys()).index(name)
             sub_param = sub_sig.parameters[name]
 
-            if (
-                super_param.kind != sub_param.kind
-                and not (
-                    super_param.kind == Parameter.POSITIONAL_ONLY
-                    and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
-                )
-                and not (
-                    super_param.kind == Parameter.KEYWORD_ONLY
-                    and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
-                )
-                and (sub_index > 0 or check_first_parameter)
+            if super_param.kind != sub_param.kind and not (
+                super_param.kind == Parameter.KEYWORD_ONLY
+                and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
             ):
                 raise TypeError(
                     f"{method_name}: `{name}` is not `{super_param.kind.description}`"
@@ -114,7 +108,64 @@ def ensure_all_args_defined_in_sub(
                 name in super_type_hints
                 and name in sub_type_hints
                 and not _issubtype(super_type_hints[name], sub_type_hints[name])
-                and (sub_index > 0 or check_first_parameter)
+            ):
+                raise TypeError(
+                    f"`{method_name}: {name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
+                )
+
+
+def ensure_all_positional_args_defined_in_sub(
+    super_sig,
+    sub_sig,
+    super_type_hints,
+    sub_type_hints,
+    check_first_parameter: bool,
+    method_name: str,
+):
+    sub_parameter_values = [
+        v
+        for v in sub_sig.parameters.values()
+        if v.kind != Parameter.KEYWORD_ONLY or v.kind != Parameter.VAR_KEYWORD
+    ]
+    sub_has_var_args = any(
+        p.kind == Parameter.VAR_POSITIONAL for p in sub_parameter_values
+    )
+    for super_index, (name, super_param) in enumerate(super_sig.parameters.items()):
+        if super_index == 0 and not check_first_parameter:
+            continue
+        if super_param.kind == Parameter.VAR_KEYWORD:
+            continue
+        if super_param.kind == Parameter.KEYWORD_ONLY:
+            continue
+        print(super_index)
+        print(super_param)
+        if not sub_has_var_args and super_index >= len(sub_parameter_values):
+            raise TypeError(
+                f"{method_name}: `{name}` with index {super_index} is not present."
+            )
+        elif super_param.kind == Parameter.VAR_POSITIONAL and not sub_has_var_args:
+            raise TypeError(f"{method_name}: `{name}` must be present")
+        elif (
+            name in sub_sig.parameters and super_param.kind != Parameter.VAR_POSITIONAL
+        ):
+            sub_index = list(sub_sig.parameters.keys()).index(name)
+            sub_param = sub_sig.parameters[name]
+
+            if super_param.kind != sub_param.kind and not (
+                super_param.kind == Parameter.POSITIONAL_ONLY
+                and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
+            ):
+                raise TypeError(
+                    f"{method_name}: `{name}` is not `{super_param.kind.description}`"
+                )
+            elif super_index != sub_index:
+                raise TypeError(
+                    f"{method_name}: `{name}` is not parameter `{super_index}`"
+                )
+            elif (
+                name in super_type_hints
+                and name in sub_type_hints
+                and not _issubtype(super_type_hints[name], sub_type_hints[name])
             ):
                 raise TypeError(
                     f"`{method_name}: {name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
@@ -169,4 +220,6 @@ def ensure_return_type_compatibility(
     super_return = super_type_hints.get("return", None)
     sub_return = sub_type_hints.get("return", None)
     if not _issubtype(sub_return, super_return) and super_return is not None:
-        raise TypeError(f"{method_name}: return type `{sub_return}` is not a `{super_return}`.")
+        raise TypeError(
+            f"{method_name}: return type `{sub_return}` is not a `{super_return}`."
+        )

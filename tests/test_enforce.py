@@ -81,6 +81,7 @@ class EnforceTests(unittest.TestCase):
 
     def test_enforcing_when_incompatible(self):
         with self.assertRaises(TypeError):
+
             class Incompatible(Enforcing):
                 @overrides
                 def nonfinal1(self, param: str):
@@ -116,6 +117,7 @@ class EnforceTests(unittest.TestCase):
                 pass
 
         with self.assertRaises(AssertionError):
+
             class SubClass(MetaClassMethodOverrider):
                 def register(self):
                     pass
@@ -125,7 +127,7 @@ class EnforceTests(unittest.TestCase):
             pass
 
         def sub(
-                self, a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
+            self, a, b: object, c, d, f: str = "foo", *args, g: str = "bar", e, **kwargs
         ) -> str:
             pass
 
