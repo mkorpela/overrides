@@ -13,7 +13,7 @@ def _issubtype(left, right):
     if isinstance(left, TypeVar):
         return True
     if right is None:
-        return left is None
+        return True
     if isinstance(right, TypeVar):
         return True
     return issubtype(left, right)
@@ -125,51 +125,54 @@ def ensure_all_positional_args_defined_in_sub(
     sub_parameter_values = [
         v
         for v in sub_sig.parameters.values()
-        if v.kind != Parameter.KEYWORD_ONLY or v.kind != Parameter.VAR_KEYWORD
+        if v.kind not in (Parameter.KEYWORD_ONLY, Parameter.VAR_KEYWORD)
+    ]
+    super_parameter_values = [
+        v
+        for v in super_sig.parameters.values()
+        if v.kind not in (Parameter.KEYWORD_ONLY, Parameter.VAR_KEYWORD)
     ]
     sub_has_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in sub_parameter_values
     )
-    for super_index, (name, super_param) in enumerate(super_sig.parameters.items()):
-        if super_index == 0 and not check_first_parameter:
+    super_has_var_args = any(
+        p.kind == Parameter.VAR_POSITIONAL for p in super_parameter_values
+    )
+    if not sub_has_var_args and len(sub_parameter_values) < len(super_parameter_values):
+        raise TypeError(f"{method_name}: parameter list too short")
+    super_shift = 0
+    for index, sub_param in enumerate(sub_parameter_values):
+        if index == 0 and not check_first_parameter:
             continue
-        if super_param.kind == Parameter.VAR_KEYWORD:
+        if index+super_shift >= len(super_parameter_values):
+            if sub_param.kind == Parameter.VAR_POSITIONAL:
+                continue
+            if sub_param.kind == Parameter.POSITIONAL_ONLY and sub_param.default != Parameter.empty:
+                continue
+            if sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD:
+                continue # Assume use as keyword
+            raise TypeError(f"{method_name}: `{sub_param.name}` positionally required in subclass but not in supertype")
+        if sub_param.kind == Parameter.VAR_POSITIONAL:
+            return
+        super_param = super_parameter_values[index + super_shift]
+        if super_param.kind == Parameter.VAR_POSITIONAL:
+            super_shift -= 1
+        if super_param.kind == Parameter.VAR_POSITIONAL:
+            if not sub_has_var_args:
+                raise TypeError(f"{method_name}: `{super_param.name}` must be present")
             continue
-        if super_param.kind == Parameter.KEYWORD_ONLY:
-            continue
-        print(super_index)
-        print(super_param)
-        if not sub_has_var_args and super_index >= len(sub_parameter_values):
+        if super_param.kind != sub_param.kind and not (
+            super_param.kind == Parameter.POSITIONAL_ONLY
+            and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
+        ) and not (sub_param.kind == Parameter.POSITIONAL_ONLY and super_has_var_args):
             raise TypeError(
-                f"{method_name}: `{name}` with index {super_index} is not present."
+                f"{method_name}: `{sub_param.name}` is not `{super_param.kind.description}` and is `{sub_param.kind.description}`"
             )
-        elif super_param.kind == Parameter.VAR_POSITIONAL and not sub_has_var_args:
-            raise TypeError(f"{method_name}: `{name}` must be present")
-        elif (
-            name in sub_sig.parameters and super_param.kind != Parameter.VAR_POSITIONAL
-        ):
-            sub_index = list(sub_sig.parameters.keys()).index(name)
-            sub_param = sub_sig.parameters[name]
-
-            if super_param.kind != sub_param.kind and not (
-                super_param.kind == Parameter.POSITIONAL_ONLY
-                and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
-            ):
-                raise TypeError(
-                    f"{method_name}: `{name}` is not `{super_param.kind.description}`"
-                )
-            elif super_index != sub_index:
-                raise TypeError(
-                    f"{method_name}: `{name}` is not parameter `{super_index}`"
-                )
-            elif (
-                name in super_type_hints
-                and name in sub_type_hints
-                and not _issubtype(super_type_hints[name], sub_type_hints[name])
-            ):
-                raise TypeError(
-                    f"`{method_name}: {name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
-                )
+        elif not _issubtype(super_type_hints.get(super_param.name, None),
+                          sub_type_hints.get(sub_param.name, None)):
+            raise TypeError(
+                f"`{method_name}: {sub_param.name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
+            )
 
 
 def is_param_defined_in_sub(
