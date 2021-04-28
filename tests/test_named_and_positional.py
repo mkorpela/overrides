@@ -6,6 +6,10 @@ class A(EnforceOverrides):
         print(x)
 
 
+class Other:
+    def foo(self):
+        pass
+
 def test_should_pass():
     class B(A):
         @overrides
@@ -33,3 +37,12 @@ def test_can_not_override_with_keyword_only():
         raise AssertionError("Should not go here")
     except TypeError:
         pass
+
+def test_multiple_inheritance():
+    class Multi(A, Other):
+        @overrides
+        def methoda(self, y=2, **kwargs):
+            pass
+        @overrides
+        def foo(self) -> int:
+            pass
