@@ -1,7 +1,7 @@
 import unittest
-from typing import Union, Optional, TypeVar
+from typing import Optional, TypeVar, Union
 
-from overrides import overrides, final, EnforceOverrides
+from overrides import EnforceOverrides, final, overrides
 from overrides.signature import ensure_signature_is_compatible
 
 
@@ -38,11 +38,11 @@ class EnforceTests(unittest.TestCase):
 
             @overrides
             def nonfinal1(self, param: int) -> str:
-                return 2
+                return "2"
 
         sc = Subclazz()
         self.assertEqual(sc.finality(), "final")
-        self.assertEqual(sc.nonfinal1(1), 2)
+        self.assertEqual(sc.nonfinal1(1), "2")
         self.assertEqual(sc.nonfinal2(), "super2")
         self.assertEqual(sc.classVariableIsOk, "OK!")
 
@@ -393,6 +393,32 @@ class EnforceTests(unittest.TestCase):
             pass
 
         def return_typed(t) -> int:
+            pass
+
+        ensure_signature_is_compatible(typevarred, untyped, True)
+        ensure_signature_is_compatible(typevarred, typed, True)
+        ensure_signature_is_compatible(untyped, typevarred, True)
+        ensure_signature_is_compatible(typed, typevarred, True)
+        ensure_signature_is_compatible(untyped, return_typed, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(untyped, typed, True)
+        with self.assertRaises(TypeError):
+            ensure_signature_is_compatible(typed, untyped, True)
+
+    def test_nested_typevar_in_signature(self):
+        T = TypeVar("T")
+        K = TypeVar("K")
+
+        def typevarred(t: Optional[T]) -> Optional[K]:
+            pass
+
+        def typed(t: Optional[str]) -> Optional[int]:
+            pass
+
+        def untyped(t):
+            pass
+
+        def return_typed(t) -> Optional[int]:
             pass
 
         ensure_signature_is_compatible(typevarred, untyped, True)

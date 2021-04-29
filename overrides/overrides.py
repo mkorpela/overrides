@@ -59,8 +59,8 @@ def overrides(
 
     :param check_signature: Whether or not to check the signature of the overridden method.
     :param check_at_runtime: Whether or not to check the overridden method at runtime.
-    :raises  AssertionError if no match in super classes for the method name
-    :return  method with possibly added (if the method doesn't have one)
+    :raises AssertionError: if no match in super classes for the method name
+    :return: method with possibly added (if the method doesn't have one)
         docstring from super class
     """
     if method:

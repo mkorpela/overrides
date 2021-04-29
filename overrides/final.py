@@ -41,8 +41,8 @@ def final(method: _WrappedMethod) -> _WrappedMethod:
         def method(self): #causes an error
             return 1
 
-    :raises  AssertionError if there exists a match in sub classes for the method name
-    :return  method
+    :raises AssertionError: if there exists a match in sub classes for the method name
+    :return: method
     """
     setattr(method, "__finalized__", True)
     return method
