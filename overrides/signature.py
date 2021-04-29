@@ -1,20 +1,42 @@
 import inspect
 from inspect import Parameter
 from types import FunctionType
-from typing import Callable, TypeVar, Union, get_type_hints, Tuple, Dict, Optional
+from typing import Callable, Dict, Optional, Tuple, Type, TypeVar, Union, get_type_hints
 
-from typing_utils import issubtype  # type: ignore
+from typing_utils import get_args, issubtype  # type: ignore
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 _WrappedMethod2 = TypeVar("_WrappedMethod2", bound=Union[FunctionType, Callable])
 
 
+def _contains_unbound_typevar(t: Type) -> bool:
+    """Recursively check if `t` or any types contained by `t` is a `TypeVar`.
+
+    Examples where we return `True`: `T`, `Optional[T]`, `Tuple[Optional[T], ...]`, ...
+    Examples where we return `False`: `int`, `Optional[str]`, ...
+
+    :param t: Type to evaluate.
+    :return: `True` if the input type contains an unbound `TypeVar`, `False` otherwise.
+    """
+
+    # Check self
+    if isinstance(t, TypeVar):
+        return True
+
+    # Check children
+    for arg in get_args(t):
+        if _contains_unbound_typevar(arg):
+            return True
+
+    return False
+
+
 def _issubtype(left, right):
-    if isinstance(left, TypeVar):
+    if _contains_unbound_typevar(left):
         return True
     if right is None:
         return True
-    if isinstance(right, TypeVar):
+    if _contains_unbound_typevar(right):
         return True
     return issubtype(left, right)
 
