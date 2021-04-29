@@ -21,7 +21,7 @@ import sys
 from types import FunctionType
 from typing import Any, Callable, List, Tuple, TypeVar, Union
 
-__VERSION__ = "5.0.0"
+__VERSION__ = "5.0.1"
 
 from overrides.signature import ensure_signature_is_compatible
 
