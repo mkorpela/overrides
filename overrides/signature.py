@@ -1,7 +1,7 @@
 import inspect
 from inspect import Parameter
 from types import FunctionType
-from typing import Callable, TypeVar, Union, get_type_hints, Tuple, Dict
+from typing import Callable, TypeVar, Union, get_type_hints, Tuple, Dict, Optional
 
 from typing_utils import issubtype  # type: ignore
 
@@ -17,6 +17,13 @@ def _issubtype(left, right):
     if isinstance(right, TypeVar):
         return True
     return issubtype(left, right)
+
+
+def _get_type_hints(callable) -> Optional[Dict]:
+    try:
+        return get_type_hints(callable)
+    except NameError:
+        return None
 
 
 def ensure_signature_is_compatible(
@@ -43,19 +50,20 @@ def ensure_signature_is_compatible(
     super_callable = _unbound_func(super_callable)
     sub_callable = _unbound_func(sub_callable)
     super_sig = inspect.signature(super_callable)
-    super_type_hints = get_type_hints(super_callable)
+    super_type_hints = _get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
-    sub_type_hints = get_type_hints(sub_callable)
+    sub_type_hints = _get_type_hints(sub_callable)
 
     method_name = sub_callable.__qualname__
 
-    ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
-    ensure_all_kwargs_defined_in_sub(
-        super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
-    )
-    ensure_all_positional_args_defined_in_sub(
-        super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
-    )
+    if super_type_hints is not None and sub_type_hints is not None:
+        ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
+        ensure_all_kwargs_defined_in_sub(
+            super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
+        )
+        ensure_all_positional_args_defined_in_sub(
+            super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
+        )
     ensure_no_extra_args_in_sub(super_sig, sub_sig, is_static, method_name)
 
 
@@ -98,9 +106,7 @@ def ensure_all_kwargs_defined_in_sub(
                 raise TypeError(
                     f"{method_name}: `{name}` is not `{super_param.kind.description}`"
                 )
-            elif (
-                super_index > sub_index and super_param.kind != Parameter.KEYWORD_ONLY
-            ):
+            elif super_index > sub_index and super_param.kind != Parameter.KEYWORD_ONLY:
                 raise TypeError(
                     f"{method_name}: `{name}` is not parameter at index `{super_index}`"
                 )
@@ -144,14 +150,19 @@ def ensure_all_positional_args_defined_in_sub(
     for index, sub_param in enumerate(sub_parameter_values):
         if index == 0 and not check_first_parameter:
             continue
-        if index+super_shift >= len(super_parameter_values):
+        if index + super_shift >= len(super_parameter_values):
             if sub_param.kind == Parameter.VAR_POSITIONAL:
                 continue
-            if sub_param.kind == Parameter.POSITIONAL_ONLY and sub_param.default != Parameter.empty:
+            if (
+                sub_param.kind == Parameter.POSITIONAL_ONLY
+                and sub_param.default != Parameter.empty
+            ):
                 continue
             if sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD:
-                continue # Assume use as keyword
-            raise TypeError(f"{method_name}: `{sub_param.name}` positionally required in subclass but not in supertype")
+                continue  # Assume use as keyword
+            raise TypeError(
+                f"{method_name}: `{sub_param.name}` positionally required in subclass but not in supertype"
+            )
         if sub_param.kind == Parameter.VAR_POSITIONAL:
             return
         super_param = super_parameter_values[index + super_shift]
@@ -161,15 +172,21 @@ def ensure_all_positional_args_defined_in_sub(
             if not sub_has_var_args:
                 raise TypeError(f"{method_name}: `{super_param.name}` must be present")
             continue
-        if super_param.kind != sub_param.kind and not (
-            super_param.kind == Parameter.POSITIONAL_ONLY
-            and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
-        ) and not (sub_param.kind == Parameter.POSITIONAL_ONLY and super_has_var_args):
+        if (
+            super_param.kind != sub_param.kind
+            and not (
+                super_param.kind == Parameter.POSITIONAL_ONLY
+                and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
+            )
+            and not (sub_param.kind == Parameter.POSITIONAL_ONLY and super_has_var_args)
+        ):
             raise TypeError(
                 f"{method_name}: `{sub_param.name}` is not `{super_param.kind.description}` and is `{sub_param.kind.description}`"
             )
-        elif not _issubtype(super_type_hints.get(super_param.name, None),
-                          sub_type_hints.get(sub_param.name, None)):
+        elif not _issubtype(
+            super_type_hints.get(super_param.name, None),
+            sub_type_hints.get(sub_param.name, None),
+        ):
             raise TypeError(
                 f"`{method_name}: {sub_param.name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
             )

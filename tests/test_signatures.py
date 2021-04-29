@@ -24,6 +24,15 @@ class SuperbClass:
     def self_typed_class_method(cls: "Type[SuperbClass]") -> None:
         return None
 
+    def foo(self, x) -> None:
+        return None
+
+
+class ForwardReferencer(SuperbClass):
+    @overrides
+    def foo(self, x: "ForwardReferencer") -> "ForwardReferencer":
+        pass
+
 
 class ClassMethodOverrider(SuperbClass):
     @classmethod
