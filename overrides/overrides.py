@@ -19,21 +19,42 @@ import functools
 import inspect
 import sys
 from types import FunctionType
-from typing import Any, Callable, List, Tuple, TypeVar, Union
+from typing import Any, Callable, List, Optional, Tuple, TypeVar, Union, overload
 
 __VERSION__ = "5.0.1"
 
 from overrides.signature import ensure_signature_is_compatible
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
+_DecoratorMethod = Callable[[_WrappedMethod], _WrappedMethod]
 
 
+@overload
 def overrides(
-    method: _WrappedMethod = None,
+    method: None = None,
     *,
     check_signature: bool = True,
     check_at_runtime: bool = False,
-) -> Any:
+) -> _DecoratorMethod:
+    ...
+
+
+@overload
+def overrides(
+    method: _WrappedMethod,
+    *,
+    check_signature: bool = True,
+    check_at_runtime: bool = False,
+) -> _WrappedMethod:
+    ...
+
+
+def overrides(
+    method: Optional[_WrappedMethod] = None,
+    *,
+    check_signature: bool = True,
+    check_at_runtime: bool = False,
+) -> Union[_DecoratorMethod, _WrappedMethod]:
     """Decorator to indicate that the decorated method overrides a method in
     superclass.
     The decorator code is executed while loading class. Using this method
@@ -63,7 +84,7 @@ def overrides(
     :return: method with possibly added (if the method doesn't have one)
         docstring from super class
     """
-    if method:
+    if method is not None:
         return _overrides(method, check_signature, check_at_runtime)
     else:
         return functools.partial(
