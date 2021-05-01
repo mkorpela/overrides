@@ -25,3 +25,5 @@ jobs:
       - name: Run Tox
         # Run tox using the version of Python in `PATH`
         run: tox -e py
+      - name: Run mypy static tests
+        run: check_mypy.sh
