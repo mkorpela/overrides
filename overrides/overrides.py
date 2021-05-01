@@ -26,6 +26,7 @@ __VERSION__ = "5.0.1"
 from overrides.signature import ensure_signature_is_compatible
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
+_DecoratorMethod = Callable[[_WrappedMethod], _WrappedMethod]
 
 
 @overload
@@ -34,7 +35,7 @@ def overrides(
     *,
     check_signature: bool = True,
     check_at_runtime: bool = False,
-) -> Callable[[_WrappedMethod], _WrappedMethod]:
+) -> _DecoratorMethod:
     ...
 
 
@@ -53,7 +54,7 @@ def overrides(
     *,
     check_signature: bool = True,
     check_at_runtime: bool = False,
-) -> Any:
+) -> Union[_DecoratorMethod, _WrappedMethod]:
     """Decorator to indicate that the decorated method overrides a method in
     superclass.
     The decorator code is executed while loading class. Using this method
