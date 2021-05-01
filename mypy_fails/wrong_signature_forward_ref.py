@@ -1,4 +1,3 @@
-from __future__ import annotations
 from overrides import overrides
 
 
@@ -9,5 +8,5 @@ class Parent:
 
 class Child(Parent):
     @overrides
-    def metoda(self) -> Child:
+    def metoda(self) -> 'Child':
         return self
