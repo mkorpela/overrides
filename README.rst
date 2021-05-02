@@ -17,9 +17,8 @@ initial inspiration for this library.
 Motivation
 ----------
 
-Python has no standard mechanism by which to guarantee that (1) a method that overrides an inherited 
-method has a compatible signature, (2) a method that previously overrode an inherited method
-continues to do so, and (3) a method that previously did not override an inherited method now does.
+Python has no standard mechanism by which to guarantee that (1) a method that previously overrode an inherited method
+continues to do so, and (2) a method that previously did not override an inherited method now does.
 This opens the door for subtle problems as class hierarchies evolve over time. For example,
 
 1. A method that is added to a superclass is shadowed by an existing method with the same name in a 
