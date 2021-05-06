@@ -38,13 +38,17 @@ def _issubtype(left, right):
         return True
     if _contains_unbound_typevar(right):
         return True
-    return issubtype(left, right)
+    try:
+        return issubtype(left, right)
+    except TypeError:
+        # Ignore all broken cases
+        return True
 
 
 def _get_type_hints(callable) -> Optional[Dict]:
     try:
         return get_type_hints(callable)
-    except NameError:
+    except (NameError, TypeError):
         return None
 
 
