@@ -48,7 +48,7 @@ def _issubtype(left, right):
 def _get_type_hints(callable) -> Optional[Dict]:
     try:
         return get_type_hints(callable)
-    except NameError:
+    except (NameError, TypeError):
         return None
 
 
