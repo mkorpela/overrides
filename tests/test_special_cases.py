@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from concurrent.futures import Future
 from typing import Callable
 
+from overrides import overrides
+
 
 class MyInterface(ABC):
     @abstractmethod
@@ -15,5 +17,15 @@ class MyInterface2(ABC):
     pass
 
 
-def test_everything_here_is_fine():
-    pass
+def test_future_is_fine():
+    class FutureWorks(MyInterface):
+        @overrides
+        def run(self) -> "Future[str]":
+            pass
+
+
+def test_callable_is_fine():
+    class CallableWorks(MyInterface2):
+        @overrides
+        def run(self, callback: Callable[[str], None]):
+            pass
