@@ -7,6 +7,7 @@ __pycache__/
 
 .venv
 .DS_Store
+tmp/
 
 # Distribution / packaging
 .Python
