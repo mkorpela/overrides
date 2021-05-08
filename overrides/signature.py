@@ -219,7 +219,7 @@ def ensure_all_positional_args_defined_in_sub(
             and not (sub_param.kind == Parameter.POSITIONAL_ONLY and super_has_var_args)
         ):
             raise TypeError(
-                f"{method_name}: `{sub_param.name}` is not `{super_param.kind.description}` and is `{sub_param.kind.description}`"
+                f"{method_name}: `{sub_param.name}` is not `{super_param.kind}` and is `{sub_param.kind}`"
             )
         elif (
             super_param.name in super_type_hints or is_same_main_module
