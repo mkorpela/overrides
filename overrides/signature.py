@@ -209,7 +209,7 @@ def ensure_all_positional_args_defined_in_sub(
             raise TypeError(
                 f"{method_name}: `{sub_param.name}` is not `{super_param.kind.description}` and is `{sub_param.kind.description}`"
             )
-        elif not _issubtype(
+        elif super_param.name in super_type_hints and not _issubtype(
             super_type_hints.get(super_param.name, None),
             sub_type_hints.get(sub_param.name, None),
         ):

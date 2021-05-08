@@ -1,4 +1,4 @@
-from typing import Type, Union
+from typing import Any, Type, Union
 
 from overrides import overrides
 
@@ -79,6 +79,17 @@ class A:
 class B(A):
     @overrides
     def foo(self: str):
+        pass
+
+
+class UntypedBaseClass:
+    def do_something(self, arg1, arg2=None):
+        pass
+
+
+class TypedSubclass(UntypedBaseClass):
+    @overrides
+    def do_something(self, arg1: str, arg2: Any = None) -> Any:
         pass
 
 

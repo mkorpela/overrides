@@ -1,9 +1,8 @@
 import unittest
-from overrides import overrides
-import test_somepackage
-
-
 from typing import Generic, TypeVar
+
+import test_somepackage
+from overrides import overrides
 
 TObject = TypeVar("TObject", bound="Foo")
 
