@@ -52,6 +52,12 @@ def _get_type_hints(callable) -> Optional[Dict]:
         return None
 
 
+def _is_same_module(callable1: _WrappedMethod, callable2: _WrappedMethod2) -> bool:
+    mod1 = callable1.__module__.split(".")[0]
+    mod2 = callable2.__module__.split(".")[0]
+    return mod1 == mod2
+
+
 def ensure_signature_is_compatible(
     super_callable: _WrappedMethod,
     sub_callable: _WrappedMethod2,
@@ -81,6 +87,7 @@ def ensure_signature_is_compatible(
     sub_type_hints = _get_type_hints(sub_callable)
 
     method_name = sub_callable.__qualname__
+    same_main_module = _is_same_module(sub_callable, super_callable)
 
     if super_type_hints is not None and sub_type_hints is not None:
         ensure_return_type_compatibility(super_type_hints, sub_type_hints, method_name)
@@ -88,7 +95,13 @@ def ensure_signature_is_compatible(
             super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
         )
         ensure_all_positional_args_defined_in_sub(
-            super_sig, sub_sig, super_type_hints, sub_type_hints, is_static, method_name
+            super_sig,
+            sub_sig,
+            super_type_hints,
+            sub_type_hints,
+            is_static,
+            same_main_module,
+            method_name,
         )
     ensure_no_extra_args_in_sub(super_sig, sub_sig, is_static, method_name)
 
@@ -152,6 +165,7 @@ def ensure_all_positional_args_defined_in_sub(
     super_type_hints: Dict,
     sub_type_hints: Dict,
     check_first_parameter: bool,
+    is_same_main_module: bool,
     method_name: str,
 ):
     sub_parameter_values = [
@@ -209,7 +223,9 @@ def ensure_all_positional_args_defined_in_sub(
             raise TypeError(
                 f"{method_name}: `{sub_param.name}` is not `{super_param.kind.description}` and is `{sub_param.kind.description}`"
             )
-        elif super_param.name in super_type_hints and not _issubtype(
+        elif (
+            super_param.name in super_type_hints or is_same_main_module
+        ) and not _issubtype(
             super_type_hints.get(super_param.name, None),
             sub_type_hints.get(sub_param.name, None),
         ):
