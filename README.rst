@@ -138,17 +138,17 @@ Flags of control
 
 .. code-block:: python
 
-# To prevent all signature checks do:
-@overrides(check_signature=False)
-def some_method(self, now_this_can_be_funny_and_wrong: str, what_ever: int) -> "Dictirux":
-    pass
+    # To prevent all signature checks do:
+    @overrides(check_signature=False)
+    def some_method(self, now_this_can_be_funny_and_wrong: str, what_ever: int) -> "Dictirux":
+        pass
 
-# To do the check only at runtime and solve forward references
-@overrides(check_at_runtime=True)
-def some_other_method(self, ..) -> "SomethingDefinedLater":
-    pass
+    # To do the check only at runtime and solve forward references
+    @overrides(check_at_runtime=True)
+    def some_other_method(self, ..) -> "SomethingDefinedLater":
+        pass
 
-a.some_other_method() # Kaboom if not SomethingDefinedLater
+    a.some_other_method() # Kaboom if not SomethingDefinedLater
 
 
 Contributors
