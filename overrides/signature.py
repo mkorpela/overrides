@@ -100,10 +100,10 @@ def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
 
 
 def ensure_all_kwargs_defined_in_sub(
-    super_sig,
-    sub_sig,
-    super_type_hints,
-    sub_type_hints,
+    super_sig: inspect.Signature,
+    sub_sig: inspect.Signature,
+    super_type_hints: Dict,
+    sub_type_hints: Dict,
     check_first_parameter: bool,
     method_name: str,
 ):
@@ -214,13 +214,17 @@ def ensure_all_positional_args_defined_in_sub(
             sub_type_hints.get(sub_param.name, None),
         ):
             raise TypeError(
-                f"`{method_name}: {sub_param.name} must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
+                f"`{method_name}: {sub_param.name} overriding must be a supertype of `{super_param.annotation}` but is `{sub_param.annotation}`"
             )
 
 
 def is_param_defined_in_sub(
-    name, sub_has_var_args, sub_has_var_kwargs, sub_sig, super_param
-):
+    name: str,
+    sub_has_var_args: bool,
+    sub_has_var_kwargs: bool,
+    sub_sig: inspect.Signature,
+    super_param: inspect.Parameter,
+) -> bool:
     return (
         name in sub_sig.parameters
         or (super_param.kind == Parameter.VAR_POSITIONAL and sub_has_var_args)
@@ -237,7 +241,7 @@ def is_param_defined_in_sub(
 
 def ensure_no_extra_args_in_sub(
     super_sig, sub_sig, check_first_parameter: bool, method_name: str
-):
+) -> None:
     super_var_args = any(
         p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
     )
