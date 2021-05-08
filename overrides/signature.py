@@ -147,10 +147,10 @@ def ensure_all_kwargs_defined_in_sub(
 
 
 def ensure_all_positional_args_defined_in_sub(
-    super_sig,
-    sub_sig,
-    super_type_hints,
-    sub_type_hints,
+    super_sig: inspect.Signature,
+    sub_sig: inspect.Signature,
+    super_type_hints: Dict,
+    sub_type_hints: Dict,
     check_first_parameter: bool,
     method_name: str,
 ):
