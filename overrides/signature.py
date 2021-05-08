@@ -142,9 +142,7 @@ def ensure_all_kwargs_defined_in_sub(
                 super_param.kind == Parameter.KEYWORD_ONLY
                 and sub_param.kind == Parameter.POSITIONAL_OR_KEYWORD
             ):
-                raise TypeError(
-                    f"{method_name}: `{name}` is not `{super_param.kind.description}`"
-                )
+                raise TypeError(f"{method_name}: `{name}` is not `{super_param.kind}`")
             elif super_index > sub_index and super_param.kind != Parameter.KEYWORD_ONLY:
                 raise TypeError(
                     f"{method_name}: `{name}` is not parameter at index `{super_index}`"
