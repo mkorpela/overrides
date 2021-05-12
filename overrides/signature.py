@@ -281,9 +281,12 @@ def ensure_no_extra_args_in_sub(
 def ensure_return_type_compatibility(
     super_type_hints: Dict, sub_type_hints: Dict, method_name: str
 ):
-    super_return = super_type_hints.get("return", None)
-    sub_return = sub_type_hints.get("return", None)
-    if not _issubtype(sub_return, super_return) and super_return is not None:
+    if "return" not in super_type_hints and "return" not in sub_type_hints:
+        return
+    
+    super_return = super_type_hints["return"]
+    sub_return = sub_type_hints["return"]
+    if not _issubtype(sub_return, super_return):
         raise TypeError(
             f"{method_name}: return type `{sub_return}` is not a `{super_return}`."
         )
