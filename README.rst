@@ -101,7 +101,7 @@ Use ``@final`` to indicate that a superclass method cannot be overriden.
 
     from overrides import EnforceOverrides, final
 
-    class SuperClass(EnforceOveriddes):
+    class SuperClass(EnforceOverrides):
 
         @final
         def foo(self):
