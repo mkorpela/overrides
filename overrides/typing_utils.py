@@ -228,6 +228,8 @@ class NormalizedType(typing.NamedTuple):
 
 
 def _normalize_args(tps: TypeArgs):
+    if isinstance(tps, str):
+        return tps
     if isinstance(tps, collections.abc.Sequence):
         return tuple(_normalize_args(type_) for type_ in tps)
     if isinstance(tps, collections.abc.Set):
