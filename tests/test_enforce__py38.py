@@ -426,5 +426,3 @@ class EnforceTests(unittest.TestCase):
         ensure_signature_is_compatible(untyped, typevarred, True)
         ensure_signature_is_compatible(typed, typevarred, True)
         ensure_signature_is_compatible(untyped, return_typed, True)
-        with self.assertRaises(TypeError):
-            ensure_signature_is_compatible(typed, untyped, True)
