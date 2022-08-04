@@ -1,4 +1,4 @@
-'''
+"""
 Backport Python3.8+ typing utils &amp; issubtype &amp; more
 
 ![Python 3.6](https://github.com/bojiang/typing_utils/workflows/Python%203.6/badge.svg)
@@ -10,7 +10,7 @@ Backport Python3.8+ typing utils &amp; issubtype &amp; more
 ``` bash
     pip install typing_utils
 ```
-'''
+"""
 
 
 import collections.abc
@@ -116,7 +116,7 @@ def get_origin(type_):
         get_origin(List[Tuple[T, T]][int]) == list
     ```
     """
-    if hasattr(typing, 'get_origin'):  # python 3.8+
+    if hasattr(typing, "get_origin"):  # python 3.8+
         _getter = getattr(typing, "get_origin")
         ori = _getter(type_)
     elif hasattr(typing.List, "_special"):  # python 3.7
@@ -158,7 +158,7 @@ def get_args(type_) -> typing.Tuple:
         get_args(Callable[[], T][int]) == ([], int)
     ```
     """
-    if hasattr(typing, 'get_args'):  # python 3.8+
+    if hasattr(typing, "get_args"):  # python 3.8+
         _getter = getattr(typing, "get_args")
         res = _getter(type_)
     elif hasattr(typing.List, "_special"):  # python 3.7
@@ -181,9 +181,9 @@ def get_args(type_) -> typing.Tuple:
 
 
 def eval_forward_ref(ref, forward_refs=None):
-    '''
+    """
     eval forward_refs in all cPython versions
-    '''
+    """
     localns = forward_refs or {}
 
     if hasattr(typing, "_eval_type"):  # python3.8 & python 3.9
@@ -198,9 +198,9 @@ def eval_forward_ref(ref, forward_refs=None):
 
 
 class NormalizedType(typing.NamedTuple):
-    '''
+    """
     Normalized type, made it possible to compare, hash between types.
-    '''
+    """
 
     origin: Type
     args: typing.Union[tuple, frozenset] = tuple()
@@ -238,9 +238,9 @@ def _normalize_args(tps: TypeArgs):
 
 
 def normalize(type_: Type) -> NormalizedType:
-    '''
+    """
     convert types to NormalizedType instances.
-    '''
+    """
     args = get_args(type_)
     origin = get_origin(type_)
     if not origin:
@@ -363,6 +363,12 @@ def _is_normal_subtype(
             _is_normal_subtype(a, right, forward_refs) for a in left.args
         )
 
+    # Literal
+    if right.origin is typing.Literal:
+        if left.origin is not typing.Literal:
+            return False
+        return set(left.args).issubset(set(right.args))
+
     # TypeVar
     if isinstance(left.origin, typing.TypeVar) and isinstance(
         right.origin, typing.TypeVar
@@ -398,7 +404,9 @@ def _is_normal_subtype(
 
 
 def issubtype(
-    left: Type, right: Type, forward_refs: typing.Optional[dict] = None,
+    left: Type,
+    right: Type,
+    forward_refs: typing.Optional[dict] = None,
 ) -> typing.Optional[bool]:
     """Check that the left argument is a subtype of the right.
     For unions, check if the type arguments of the left is a subset of the right.
