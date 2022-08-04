@@ -1,3 +1,6 @@
+from abc import abstractmethod, ABC
+from typing import Literal
+
 from overrides import overrides, EnforceOverrides
 
 
@@ -24,6 +27,19 @@ def test_should_also_pass():
         @overrides
         def methoda(self, z=1, x=1, **kwargs):
             pass
+
+
+class Abs(ABC):
+    @abstractmethod
+    def method(self, str: Literal["max","min"]):
+        pass
+
+
+def test_literal_passes():
+    class B(Abs):
+        @overrides
+        def method(self, str: Literal["max","min"]):
+            return
 
 
 def test_can_not_override_with_positional_only():
