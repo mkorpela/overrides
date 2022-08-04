@@ -3,6 +3,5 @@ flake8>=3.9.1
 isort>=5.8.0
 mypy>=0.812
 pytest>=6.2.3
-typing-utils>=0.0.3
 pip>=21.0.1
 wheel>=0.36.2

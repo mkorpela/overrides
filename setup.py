@@ -28,7 +28,7 @@ setup(
         "overrides": ["*.pyi", "py.typed"],
     },
     include_package_data=True,
-    install_requires=['typing;python_version<"3.5"', "typing-utils>=0.0.3"],
+    install_requires=['typing;python_version<"3.5"'],
     python_requires=">=3.6",
     license="Apache License, Version 2.0",
     keywords=["override", "inheritence", "OOP"],
