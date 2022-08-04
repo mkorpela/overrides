@@ -89,10 +89,12 @@ class UntypedBaseClass:
 
 def test_typed_subclass_in_same_package_is_an_error():
     try:
+
         class TypedSubclass(UntypedBaseClass):
             @overrides
             def do_something(self, arg1: str, arg2: Any = None) -> Any:
                 pass
+
         raise AssertionError("Should not go here")
     except TypeError:
         pass

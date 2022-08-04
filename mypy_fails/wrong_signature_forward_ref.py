@@ -8,5 +8,5 @@ class Parent:
 
 class Child(Parent):
     @overrides
-    def metoda(self) -> 'Child':
+    def metoda(self) -> "Child":
         return self

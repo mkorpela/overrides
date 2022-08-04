@@ -13,9 +13,9 @@ class MyInterface(ABC):
 
 
 class MyInterface2(ABC):
-  @abstractmethod
-  def run(self, callback: Callable[[str], None]):
-    pass
+    @abstractmethod
+    def run(self, callback: Callable[[str], None]):
+        pass
 
 
 def test_future_is_fine():
@@ -37,5 +37,7 @@ def test_overriding_untyped_from_other_package_is_fine():
         DEFAULT = object()
 
         @overrides
-        def pop(self, key: str, default: Any = DEFAULT, keep_as_dict: bool = False) -> Any:
+        def pop(
+            self, key: str, default: Any = DEFAULT, keep_as_dict: bool = False
+        ) -> Any:
             pass

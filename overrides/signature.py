@@ -108,7 +108,7 @@ def ensure_signature_is_compatible(
 
 def _unbound_func(callable: _WrappedMethod) -> _WrappedMethod:
     if hasattr(callable, "__self__") and hasattr(callable, "__func__"):
-        return callable.__func__
+        return callable.__func__  # type: ignore
     return callable
 
 
