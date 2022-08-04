@@ -97,7 +97,7 @@ def _normalize_aliases(type_: Type) -> Type:
     assert _hashable(type_), "_normalize_aliases should only be called on element types"
 
     if type_ in BUILTINS_MAPPING:
-        return BUILTINS_MAPPING[type_]
+        return BUILTINS_MAPPING[type_]  # type: ignore
     return type_
 
 
@@ -167,16 +167,16 @@ def get_args(type_) -> typing.Tuple:
         res = _getter(type_)
     elif hasattr(typing.List, "_special"):  # python 3.7
         if (
-            isinstance(type_, GenericClass) and not type_._special
+            isinstance(type_, GenericClass) and not type_._special  # type: ignore
         ):  # backport for python 3.8
-            res = type_.__args__
+            res = type_.__args__  # type: ignore
             if get_origin(type_) is collections.abc.Callable and res[0] is not Ellipsis:
                 res = (list(res[:-1]), res[-1])
         else:
             res = ()
     else:  # python 3.6
         if isinstance(type_, (GenericClass, UnionClass)):  # backport for python 3.8
-            res = type_.__args__
+            res = type_.__args__  # type: ignore
             if get_origin(type_) is collections.abc.Callable and res[0] is not Ellipsis:
                 res = (list(res[:-1]), res[-1])
         else:
@@ -270,7 +270,7 @@ def _is_origin_subtype(left: OriginType, right: OriginType) -> bool:
         return True
 
     if hasattr(left, "mro"):
-        for parent in left.mro():
+        for parent in left.mro():  # type: ignore
             if parent == right:
                 return True
 
@@ -279,17 +279,16 @@ def _is_origin_subtype(left: OriginType, right: OriginType) -> bool:
 
     return left == right
 
-
 NormalizedTypeArgs = typing.Union[
-    typing.Tuple["NormalizedTypeArgs", ...],
+    typing.Tuple[typing.Any, ...],
     typing.FrozenSet[NormalizedType],
     NormalizedType,
 ]
 
 
 def _is_origin_subtype_args(
-    left: NormalizedTypeArgs,
-    right: NormalizedTypeArgs,
+    left: "NormalizedTypeArgs",
+    right: "NormalizedTypeArgs",
     forward_refs: typing.Optional[typing.Mapping[str, type]],
 ) -> typing.Optional[bool]:
     if isinstance(left, frozenset):
