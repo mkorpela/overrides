@@ -23,8 +23,9 @@ jobs:
          pip install -U pip
          pip install -r requirements-dev.txt
          pip install .
-      - name: Run Tox
-        # Run tox using the version of Python in `PATH`
-        run: tox -e py
+      - name: Run pytest
+        run: pytest tests
+      - name: Run mypy
+        run:  mypy overrides
       - name: Run mypy static tests
         run: ./check_mypy.sh
