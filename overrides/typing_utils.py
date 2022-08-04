@@ -25,6 +25,10 @@ elif hasattr(typing, "_ForwardRef"):  # python3.6
 else:
     raise NotImplementedError()
 
+if hasattr(typing, "Literal"):
+    Literal = getattr(typing, "Literal")
+else:
+    Literal = None
 
 unknown = None
 
@@ -364,8 +368,8 @@ def _is_normal_subtype(
         )
 
     # Literal
-    if right.origin is typing.Literal:
-        if left.origin is not typing.Literal:
+    if right.origin is Literal:
+        if left.origin is not Literal:
             return False
         return set(left.args).issubset(set(right.args))
 
