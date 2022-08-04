@@ -3,7 +3,7 @@ from inspect import Parameter
 from types import FunctionType
 from typing import Callable, Dict, Optional, Tuple, Type, TypeVar, Union, get_type_hints
 
-from typing_utils import get_args, issubtype  # type: ignore
+from .typing_utils import get_args, issubtype
 
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 _WrappedMethod2 = TypeVar("_WrappedMethod2", bound=Union[FunctionType, Callable])
