@@ -12,6 +12,9 @@ class SuperClass(object):
     def some_finalized_method(self):
         return "super_final"
 
+    @final
+    class SomeFinalClass:
+        pass
 
 class SubClass(SuperClass):
     @overrides
@@ -57,6 +60,18 @@ class FinalTests(unittest.TestCase):
 
                 @overrides
                 def some_finalized_method(self):
+                    pass
+
+            raise RuntimeError("Should not go here")
+        except TypeError:
+            pass
+
+    def test_final_fails_inner_class(self):
+        try:
+
+            class SubClassFail(SuperClass):
+                @overrides(super_class=SuperClass)
+                class SomeFinalClass:
                     pass
 
             raise RuntimeError("Should not go here")
