@@ -19,13 +19,13 @@ import functools
 import inspect
 import sys
 from types import FunctionType
-from typing import Any, Callable, List, Optional, Tuple, TypeVar, Union, overload
+from typing import Any, Callable, List, Optional, Tuple, Type, TypeVar, Union, overload
 
 __VERSION__ = "6.2.0"
 
 from overrides.signature import ensure_signature_is_compatible
 
-_WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
+_WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable, Type])
 _DecoratorMethod = Callable[[_WrappedMethod], _WrappedMethod]
 
 
@@ -52,6 +52,7 @@ def overrides(
 def overrides(
     method: Optional[_WrappedMethod] = None,
     *,
+    super_class: Optional[Type] = None,
     check_signature: bool = True,
     check_at_runtime: bool = False,
 ) -> Union[_DecoratorMethod, _WrappedMethod]:
@@ -85,10 +86,11 @@ def overrides(
         docstring from super class
     """
     if method is not None:
-        return _overrides(method, check_signature, check_at_runtime)
+        return _overrides(method, super_class, check_signature, check_at_runtime)
     else:
         return functools.partial(
             overrides,
+            super_class=super_class,
             check_signature=check_signature,
             check_at_runtime=check_at_runtime,
         )
@@ -96,24 +98,32 @@ def overrides(
 
 def _overrides(
     method: _WrappedMethod,
+    super_class: Optional[Type],
     check_signature: bool,
     check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
-    for super_class in _get_base_classes(sys._getframe(3), method.__globals__):
-        if hasattr(super_class, method.__name__):
-            if check_at_runtime:
+    if super_class is None:
+        globals = getattr(method, "__globals__", None)
+        if globals is None:
+            raise TypeError(f"{method.__qualname__}: Unable to deduce superclass, use overrides(super_class=...)")
+        for candidate_super_class in _get_base_classes(sys._getframe(3), globals):
+            if hasattr(candidate_super_class, method.__name__):
+                super_class = candidate_super_class
+                break
+    if super_class is None:
+        raise TypeError(f"{method.__qualname__}: No super class method found, use overrides(super_class=...)")
+    if check_at_runtime:
 
-                @functools.wraps(method)
-                def wrapper(*args, **kwargs):
-                    _validate_method(method, super_class, check_signature)
-                    return method(*args, **kwargs)
+        @functools.wraps(method)
+        def wrapper(*args, **kwargs):
+            _validate_method(method, super_class, check_signature)
+            return method(*args, **kwargs)
 
-                return wrapper  # type: ignore
-            else:
-                _validate_method(method, super_class, check_signature)
-                return method
-    raise TypeError(f"{method.__qualname__}: No super class method found")
+        return wrapper  # type: ignore
+    else:
+        _validate_method(method, super_class, check_signature)
+        return method
 
 
 def _validate_method(method, super_class, check_signature):
@@ -130,6 +140,7 @@ def _validate_method(method, super_class, check_signature):
     if (
         check_signature
         and not method.__name__.startswith("__")
+        and not isinstance(super_method, type)
         and not isinstance(super_method, property)
     ):
         ensure_signature_is_compatible(super_method, method, is_static)
