@@ -54,7 +54,11 @@ def _get_type_hints(callable) -> Optional[Dict]:
 
 def _is_same_module(callable1: _WrappedMethod, callable2: _WrappedMethod2) -> bool:
     mod1 = callable1.__module__.split(".")[0]
-    mod2 = callable2.__module__.split(".")[0]
+    try:
+        mod2 = callable2.__module__
+    except AttributeError:
+        return False
+    mod2 = mod2.split(".")[0]
     return mod1 == mod2
 
 
