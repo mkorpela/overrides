@@ -61,6 +61,10 @@ class SubclassOfInt(int):
     def __str__(self):
         return "subclass of int"
 
+    @overrides
+    def bit_length(self):
+        pass
+
 
 class CheckAtRuntime(SuperClass):
     @overrides(check_at_runtime=True)
