@@ -70,7 +70,7 @@ class FinalTests(unittest.TestCase):
         try:
 
             class SubClassFail(SuperClass):
-                @overrides(super_class=SuperClass)
+                @overrides
                 class SomeFinalClass:
                     pass
 

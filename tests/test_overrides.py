@@ -76,7 +76,7 @@ class StaticMethodOverridePass(SuperClass):
 
 
 class InnerClassOverride(SuperClass):
-    @overrides(super_class=SuperClass)
+    @overrides
     class SomeClass:
         def check(self):
             return 1
