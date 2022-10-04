@@ -35,6 +35,10 @@ class SuperClass(object):
         """Super Class Docs"""
         return "super"
 
+    class SomeClass:
+        """Super Inner Class Docs"""
+        def check(self):
+            return 0
 
 class SubClass(SuperClass):
     @overrides
@@ -78,11 +82,24 @@ class StaticMethodOverridePass(SuperClass):
         pass
 
 
+class InnerClassOverride(SuperClass):
+    @overrides
+    class SomeClass:
+        def check(self):
+            return 1
+
 class OverridesTests(unittest.TestCase):
     def test_overrides_passes_for_same_package_superclass(self):
         sub = SubClass()
         self.assertEqual(sub.some_method(), "sub")
         self.assertEqual(sub.some_method.__doc__, "Super Class Docs")
+
+    def test_override_inner_class(self):
+        sup = SuperClass.SomeClass()
+        sub = InnerClassOverride.SomeClass()
+        self.assertEqual(sup.check(), 0)
+        self.assertEqual(sub.check(), 1)
+        self.assertEqual(sup.__doc__, sub.__doc__)
 
     def test_overrides_does_not_override_method_doc(self):
         sub = Subber()
