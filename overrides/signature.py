@@ -85,7 +85,12 @@ def ensure_signature_is_compatible(
     """
     super_callable = _unbound_func(super_callable)
     sub_callable = _unbound_func(sub_callable)
-    super_sig = inspect.signature(super_callable)
+
+    try:
+        super_sig = inspect.signature(super_callable)
+    except ValueError:
+        return
+
     super_type_hints = _get_type_hints(super_callable)
     sub_sig = inspect.signature(sub_callable)
     sub_type_hints = _get_type_hints(sub_callable)

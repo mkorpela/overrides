@@ -1,10 +1,17 @@
+import sys
 import unittest
+from contextlib import contextmanager
 from typing import Generic, TypeVar
 
 import test_somepackage
 from overrides import overrides
 
 TObject = TypeVar("TObject", bound="Foo")
+
+
+@contextmanager
+def no_error():
+    yield
 
 
 class SubClassOfGeneric(Generic[TObject]):
@@ -56,10 +63,6 @@ class SubclassOfInt(int):
     @overrides
     def __str__(self):
         return "subclass of int"
-
-    @overrides
-    def bit_length(self):
-        pass
 
 
 class CheckAtRuntime(SuperClass):
@@ -128,6 +131,29 @@ class OverridesTests(unittest.TestCase):
     def test_overrides_check_at_runtime(self):
         with self.assertRaises(TypeError):
             CheckAtRuntime().some_method(1)
+
+    def test_overrides_builtin_method_correct_signature(self):
+        class SubclassOfInt(int):
+            @overrides
+            def bit_length(self):
+                return super().bit_length()
+
+        x = SubclassOfInt(1)
+        self.assertEqual(x.bit_length(), 1)
+
+    def test_overrides_builtin_method_incorrect_signature(self):
+        if sys.version_info >= (3, 7):
+            expected_error = self.assertRaises(TypeError)
+        else:
+            # In 3.6 inspecting signature's isn't possible for builtin
+            # methods so this this passes the signature check.
+            expected_error = no_error()
+
+        with expected_error:
+            class SubclassOfInt(int):
+                @overrides
+                def bit_length(self, _):
+                    "This will fail, bit_length takes in no arguments"
 
 
 if __name__ == "__main__":
