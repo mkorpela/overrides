@@ -157,4 +157,4 @@ Contributors
 This project exists only through the work of all the people who contribute.
 
 mkorpela, drorasaf, ngoodman90, TylerYep, leeopop, donpatrice, jayvdb, joelgrus, lisyarus, 
-soulmerge, rkr-at-dbx, ashwin153, brentyi
+soulmerge, rkr-at-dbx, ashwin153, brentyi,  jobh, tjsmart.
