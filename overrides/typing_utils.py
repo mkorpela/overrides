@@ -34,6 +34,7 @@ unknown = None
 
 
 BUILTINS_MAPPING = {
+    typing.TypedDict: dict,
     typing.List: list,
     typing.Set: set,
     typing.Dict: dict,
@@ -46,6 +47,7 @@ BUILTINS_MAPPING = {
 
 
 STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
+    typing.TypedDict: dict,
     io.TextIOWrapper: typing.TextIO,
     io.TextIOBase: typing.TextIO,
     io.StringIO: typing.TextIO,
@@ -143,6 +145,8 @@ def get_origin(type_):
             ori = typing.Generic
         else:
             ori = None
+    if ori is None and isinstance(type_, typing._TypedDictMeta):
+        ori = dict
     return _normalize_aliases(ori)
 
 
@@ -181,6 +185,8 @@ def get_args(type_) -> typing.Tuple:
                 res = (list(res[:-1]), res[-1])
         else:
             res = ()
+    if isinstance(type_, typing._TypedDictMeta):
+        return str, typing.Any
     return () if res is None else res
 
 
