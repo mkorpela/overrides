@@ -46,7 +46,6 @@ BUILTINS_MAPPING = {
 
 
 STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
-    typing.TypedDict: dict,
     io.TextIOWrapper: typing.TextIO,
     io.TextIOBase: typing.TextIO,
     io.StringIO: typing.TextIO,
