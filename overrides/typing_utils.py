@@ -34,7 +34,6 @@ unknown = None
 
 
 BUILTINS_MAPPING = {
-    typing.TypedDict: dict,
     typing.List: list,
     typing.Set: set,
     typing.Dict: dict,
