@@ -30,6 +30,12 @@ if hasattr(typing, "Literal"):
 else:
     Literal = None
 
+if hasattr(typing, "_TypedDictMeta"):
+    _TypedDictMeta = getattr(typing, "_TypedDictMeta")
+else:
+    _TypedDictMeta = None
+
+
 unknown = None
 
 
@@ -143,7 +149,7 @@ def get_origin(type_):
             ori = typing.Generic
         else:
             ori = None
-    if ori is None and isinstance(type_, typing._TypedDictMeta):
+    if ori is None and _TypedDictMeta and isinstance(type_, _TypedDictMeta):
         ori = dict
     return _normalize_aliases(ori)
 
@@ -183,7 +189,7 @@ def get_args(type_) -> typing.Tuple:
                 res = (list(res[:-1]), res[-1])
         else:
             res = ()
-    if isinstance(type_, typing._TypedDictMeta):
+    if _TypedDictMeta and isinstance(type_, _TypedDictMeta):
         return str, typing.Any
     return () if res is None else res
 
