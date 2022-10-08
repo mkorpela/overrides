@@ -37,8 +37,10 @@ class SuperClass(object):
 
     class SomeClass:
         """Super Inner Class Docs"""
+
         def check(self):
             return 0
+
 
 class SubClass(SuperClass):
     @overrides
@@ -87,6 +89,7 @@ class InnerClassOverride(SuperClass):
     class SomeClass:
         def check(self):
             return 1
+
 
 class OverridesTests(unittest.TestCase):
     def test_overrides_passes_for_same_package_superclass(self):
@@ -167,6 +170,7 @@ class OverridesTests(unittest.TestCase):
             expected_error = no_error()
 
         with expected_error:
+
             class SubclassOfInt(int):
                 @overrides
                 def bit_length(self, _):

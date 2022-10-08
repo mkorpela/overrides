@@ -95,9 +95,7 @@ def overrides(
 
 
 def _overrides(
-    method: _WrappedMethod,
-    check_signature: bool,
-    check_at_runtime: bool,
+    method: _WrappedMethod, check_signature: bool, check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
     global_vars = getattr(method, "__globals__", None)

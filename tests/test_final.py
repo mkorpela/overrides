@@ -16,6 +16,7 @@ class SuperClass(object):
     class SomeFinalClass:
         pass
 
+
 class SubClass(SuperClass):
     @overrides
     def some_method(self):

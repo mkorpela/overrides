@@ -8,6 +8,9 @@ class A(EnforceOverrides):
     def methoda(self, x=0):
         print(x)
 
+    def methodb(self, x: int, /, y: str) -> str:
+        return y * x
+
 
 class Other:
     def foo(self):
@@ -80,6 +83,33 @@ def test_can_not_override_with_positional_only():
             @overrides
             def methoda(self, x=0, /):
                 pass
+
+        raise AssertionError("Should not go here")
+    except TypeError:
+        pass
+
+
+def test_can_override_positional_only():
+    class PositionalOnly1(A):
+        @overrides
+        def methodb(self, x: int, /, y: str) -> str:
+            return "OK"
+
+
+def test_can_override_positional_only_with_new_name():
+    class PositionalOnly2(A):
+        @overrides
+        def methodb(self, new_name_is_ok: int, /, y: str) -> str:
+            return "OK2"
+
+
+def test_can_not_override_positional_only_with_new_type():
+    try:
+
+        class PositionalOnly3(A):
+            @overrides
+            def methodb(self, x: str, /, y: str) -> str:
+                return "NOPE"
 
         raise AssertionError("Should not go here")
     except TypeError:

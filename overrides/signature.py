@@ -263,15 +263,21 @@ def is_param_defined_in_sub(
 
 
 def ensure_no_extra_args_in_sub(
-    super_sig, sub_sig, check_first_parameter: bool, method_name: str
+    super_sig: inspect.Signature,
+    sub_sig: inspect.Signature,
+    check_first_parameter: bool,
+    method_name: str,
 ) -> None:
-    super_var_args = any(
-        p.kind == Parameter.VAR_POSITIONAL for p in super_sig.parameters.values()
-    )
-    super_var_kwargs = any(
-        p.kind == Parameter.VAR_KEYWORD for p in super_sig.parameters.values()
-    )
+    super_params = super_sig.parameters.values()
+    super_var_args = any(p.kind == Parameter.VAR_POSITIONAL for p in super_params)
+    super_var_kwargs = any(p.kind == Parameter.VAR_KEYWORD for p in super_params)
     for sub_index, (name, sub_param) in enumerate(sub_sig.parameters.items()):
+        if (
+            sub_param.kind == Parameter.POSITIONAL_ONLY
+            and len(super_params) > sub_index
+            and list(super_params)[sub_index].kind == Parameter.POSITIONAL_ONLY
+        ):
+            continue
         if (
             name not in super_sig.parameters
             and sub_param.default == Parameter.empty
