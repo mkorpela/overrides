@@ -77,6 +77,10 @@ Use ``@overrides`` to indicate that a subclass method should override a supercla
         @overrides
         def bar(self, y) -> int: # Raises, because the signature is not compatible.
             return y
+            
+        @overrides
+        def zoo(self): # Raises, because does not exists in the super class.
+            return "foobarzoo"
 
 Use ``EnforceOverrides`` to require subclass methods that shadow superclass methods to be decorated 
 with ``@overrides``.
