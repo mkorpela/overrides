@@ -143,7 +143,7 @@ Flags of control
     def some_method(self, now_this_can_be_funny_and_wrong: str, what_ever: int) -> "Dictirux":
         pass
 
-    # To do the check only at runtime and solve forward references
+    # To do the check only at runtime and solve some forward reference problems
     @overrides(check_at_runtime=True)
     def some_other_method(self, ..) -> "SomethingDefinedLater":
         pass
