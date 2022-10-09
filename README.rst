@@ -77,6 +77,10 @@ Use ``@overrides`` to indicate that a subclass method should override a supercla
         @overrides
         def bar(self, y) -> int: # Raises, because the signature is not compatible.
             return y
+            
+        @overrides
+        def zoo(self): # Raises, because does not exist in the super class.
+            return "foobarzoo"
 
 Use ``EnforceOverrides`` to require subclass methods that shadow superclass methods to be decorated 
 with ``@overrides``.
@@ -143,7 +147,7 @@ Flags of control
     def some_method(self, now_this_can_be_funny_and_wrong: str, what_ever: int) -> "Dictirux":
         pass
 
-    # To do the check only at runtime and solve forward references
+    # To do the check only at runtime and solve some forward reference problems
     @overrides(check_at_runtime=True)
     def some_other_method(self, ..) -> "SomethingDefinedLater":
         pass
