@@ -24,13 +24,16 @@ class EnforceOverridesMeta(ABCMeta):
         for base in bases:
             base_class_method = getattr(base, name, False)
             if (
-                    not base_class_method
-                    or not callable(base_class_method)
-                    or getattr(base_class_method, "__ignored__", False)
+                not base_class_method
+                or not callable(base_class_method)
+                or getattr(base_class_method, "__ignored__", False)
             ):
                 continue
             if not is_override:
-                raise TypeError(f"Method {name} overrides but does not have @overrides decorator")
+                raise TypeError(
+                    f"Method {name} overrides but does not have @overrides decorator"
+                )
+
     @staticmethod
     def _check_if_overrides_final_method(name, bases):
         for base in bases:
@@ -38,8 +41,8 @@ class EnforceOverridesMeta(ABCMeta):
             # `__finalized__` is added by `@final` decorator
             if getattr(base_class_method, "__finalized__", False):
                 raise TypeError(
-                    f"Method {base_class_method} is finalized in {base}, it cannot be overridden"
-            )
+                    f"Method {name} is finalized in {base}, it cannot be overridden"
+                )
 
     @staticmethod
     def _handle_special_value(value):
@@ -48,7 +51,6 @@ class EnforceOverridesMeta(ABCMeta):
         elif isinstance(value, property):
             value = value.fget
         return value
-
 
 
 class EnforceOverrides(metaclass=EnforceOverridesMeta):
