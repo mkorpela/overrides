@@ -99,7 +99,7 @@ with ``@overrides``.
         def foo(self): # Raises, because @overrides is missing.
             return 2
 
-Use ``@final`` to indicate that a superclass method cannot be overriden.
+Use ``@final`` to indicate that a superclass method cannot be overriden. Note that this is not the same as `typing.final` from PEP 591.
 
 .. code-block:: python
 
