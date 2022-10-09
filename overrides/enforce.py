@@ -31,7 +31,7 @@ class EnforceOverridesMeta(ABCMeta):
                 continue
             if not is_override:
                 raise TypeError(
-                    f"Method {name} overrides but does not have @overrides decorator"
+                    f"Method {name} overrides method from {base} but does not have @overrides decorator"
                 )
 
     @staticmethod

@@ -127,7 +127,7 @@ def _validate_method(method, super_class, check_signature):
     if hasattr(super_method, "__finalized__"):
         finalized = getattr(super_method, "__finalized__")
         if finalized:
-            raise TypeError(f"{method.__name__}: is finalized")
+            raise TypeError(f"{method.__name__}: is finalized in {super_class}")
     if not method.__doc__:
         method.__doc__ = super_method.__doc__
     if (
