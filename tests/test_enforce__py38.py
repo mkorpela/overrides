@@ -12,6 +12,11 @@ class Enforcing(EnforceOverrides):
     def finality(self):
         return "final"
 
+
+    @final
+    def __and__(self, other):
+        return True
+
     def nonfinal1(self, param: int) -> str:
         return "super1"
 
@@ -47,26 +52,23 @@ class EnforceTests(unittest.TestCase):
         self.assertEqual(sc.classVariableIsOk, "OK!")
 
     def test_enforcing_when_finality_broken(self):
-        try:
-
+        with self.assertRaises(TypeError):
             class BrokesFinality(Enforcing):
                 def finality(self):
                     return "NEVER HERE"
 
-            raise RuntimeError("Should not go here")
-        except AssertionError:
-            pass
+    def test_trying_to_override_final_magic_method(self):
+        with self.assertRaises(TypeError):
+            class FinalMagicOverrides(Enforcing):
+                def __and__(self, other):
+                    return False
 
     def test_enforcing_when_none_explicit_override(self):
-        try:
-
+        with self.assertRaises(TypeError):
             class Overrider(Enforcing):
                 def nonfinal2(self):
                     return "NEVER HERE EITHER"
 
-            raise RuntimeError("Should not go here")
-        except AssertionError:
-            pass
 
     def test_enforcing_when_property_overriden(self):
         class PropertyOverrider(Enforcing):
@@ -116,7 +118,7 @@ class EnforceTests(unittest.TestCase):
             def register(self):
                 pass
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(TypeError):
 
             class SubClass(MetaClassMethodOverrider):
                 def register(self):
