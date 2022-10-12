@@ -145,42 +145,21 @@ def _get_base_classes(frame, namespace):
     ]
 
 
-def op_stream(code, max):
-    """Generator function: convert Python bytecode into a sequence of
-    opcode-argument pairs."""
-    i = 0
-    ext_arg = 0
-    while i <= max:
-        op = code[i]
-        arg = code[i+1]
-        i += 2
-        if op == dis.EXTENDED_ARG:
-            ext_arg += arg
-            ext_arg <<= 8
-            continue
-        else:
-            yield op, arg + ext_arg
-            ext_arg = 0
-
-
 def _get_base_class_names(frame) -> List[List[str]]:
     """Get baseclass names from the code object"""
-    co, lasti = frame.f_code, frame.f_lasti
-    code = co.co_code
-
+    co = frame.f_code
     extends: List[Tuple[str, str]] = []
-    for (op, oparg) in op_stream(code, lasti):
-        if op not in dis.hasname:
+    for instruction in dis.get_instructions(frame.f_code):
+        if instruction.opcode not in dis.hasname:
             continue
-        print(dis.opname[op])
-        if dis.opname[op] == "LOAD_NAME":
-            extends.append(("name", co.co_names[oparg]))
-        elif dis.opname[op] == "LOAD_ATTR":
-            extends.append(("attr", co.co_names[oparg]))
-        elif dis.opname[op] == "LOAD_GLOBAL":
-            print(co.co_names)
-            print(oparg)
-            extends.append(("name", co.co_names[oparg]))
+        if instruction.offset > frame.f_lasti:
+            break
+        if instruction.opname == "LOAD_NAME":
+            extends.append(("name", instruction.argval))
+        elif instruction.opname == "LOAD_ATTR":
+            extends.append(("attr", instruction.argval))
+        elif instruction.opname == "LOAD_GLOBAL":
+            extends.append(("name", instruction.argval))
         else:
             extends = []
 
