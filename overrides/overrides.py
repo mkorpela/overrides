@@ -95,9 +95,7 @@ def overrides(
 
 
 def _overrides(
-    method: _WrappedMethod,
-    check_signature: bool,
-    check_at_runtime: bool,
+    method: _WrappedMethod, check_signature: bool, check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
     global_vars = getattr(method, "__globals__", None)
@@ -147,7 +145,6 @@ def _get_base_classes(frame, namespace):
 
 def _get_base_class_names(frame) -> List[List[str]]:
     """Get baseclass names from the code object"""
-    co = frame.f_code
     extends: List[Tuple[str, str]] = []
     for instruction in dis.get_instructions(frame.f_code):
         if instruction.opcode not in dis.hasname:
@@ -163,7 +160,7 @@ def _get_base_class_names(frame) -> List[List[str]]:
         else:
             extends = []
 
-    items:List[List[str]] = []
+    items: List[List[str]] = []
     previous_item: List[str] = []
     for t, s in extends:
         if t == "name":

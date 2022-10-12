@@ -291,9 +291,7 @@ def _is_origin_subtype(left: OriginType, right: OriginType) -> bool:
 
 
 NormalizedTypeArgs = typing.Union[
-    typing.Tuple[typing.Any, ...],
-    typing.FrozenSet[NormalizedType],
-    NormalizedType,
+    typing.Tuple[typing.Any, ...], typing.FrozenSet[NormalizedType], NormalizedType,
 ]
 
 
@@ -418,9 +416,7 @@ def _is_normal_subtype(
 
 
 def issubtype(
-    left: Type,
-    right: Type,
-    forward_refs: typing.Optional[dict] = None,
+    left: Type, right: Type, forward_refs: typing.Optional[dict] = None,
 ) -> typing.Optional[bool]:
     """Check that the left argument is a subtype of the right.
     For unions, check if the type arguments of the left is a subset of the right.
