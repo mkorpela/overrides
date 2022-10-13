@@ -146,11 +146,15 @@ def _get_base_classes(frame, namespace):
 def _get_base_class_names(frame) -> List[List[str]]:
     """Get baseclass names from the code object"""
     extends: List[Tuple[str, str]] = []
+    add_last_step = True
     for instruction in dis.get_instructions(frame.f_code):
         if instruction.offset > frame.f_lasti:
             break
         if instruction.opcode not in dis.hasname:
             continue
+        if not add_last_step:
+            extends = []
+            add_last_step = True
         if instruction.opname == "LOAD_NAME":
             extends.append(("name", instruction.argval))
         elif instruction.opname == "LOAD_ATTR":
@@ -158,7 +162,7 @@ def _get_base_class_names(frame) -> List[List[str]]:
         elif instruction.opname == "LOAD_GLOBAL":
             extends.append(("name", instruction.argval))
         else:
-            extends = []
+            add_last_step = False
 
     items: List[List[str]] = []
     previous_item: List[str] = []
