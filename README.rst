@@ -100,7 +100,7 @@ with ``@overrides``.
             return 2
 
 Use ``@final`` to indicate that a superclass method cannot be overriden.
-With Python 3.11 and above ``@final`` is directly ``typing.final`` from `PEP 591 <https://peps.python.org/pep-0591/>`_.
+With Python 3.11 and above ``@final`` is directly `typing.final <https://docs.python.org/3.11/library/typing.html#typing.final>`_.
 
 .. code-block:: python
 
