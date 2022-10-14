@@ -19,9 +19,9 @@ import functools
 import inspect
 import sys
 from types import FunctionType
-from typing import Any, Callable, List, Optional, Tuple, TypeVar, Union, overload
+from typing import Callable, List, Optional, Tuple, TypeVar, Union, overload
 
-__VERSION__ = "6.2.0"
+__VERSION__ = "7.2.0"
 
 from overrides.signature import ensure_signature_is_compatible
 

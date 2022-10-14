@@ -1,5 +1,6 @@
 from overrides.enforce import EnforceOverrides
 import sys
+
 if sys.version_info < (3, 11):
     from overrides.final import final
 else:
