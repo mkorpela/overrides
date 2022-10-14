@@ -1,5 +1,9 @@
 from overrides.enforce import EnforceOverrides
-from overrides.final import final
+import sys
+if sys.version_info < (3, 11):
+    from overrides.final import final
+else:
+    from typing import final
 from overrides.overrides import __VERSION__, overrides
 
 __all__ = [

@@ -122,10 +122,8 @@ def _validate_method(method, super_class, check_signature):
     is_static = isinstance(
         inspect.getattr_static(super_class, method.__name__), staticmethod
     )
-    if hasattr(super_method, "__finalized__"):
-        finalized = getattr(super_method, "__finalized__")
-        if finalized:
-            raise TypeError(f"{method.__name__}: is finalized in {super_class}")
+    if getattr(super_method, "__final__", False):
+        raise TypeError(f"{method.__name__}: is finalized in {super_class}")
     if not method.__doc__:
         method.__doc__ = super_method.__doc__
     if (

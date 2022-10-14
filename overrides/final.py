@@ -16,9 +16,6 @@
 from types import FunctionType
 from typing import Callable, TypeVar, Union
 
-__VERSION__ = "0.1"
-
-
 _WrappedMethod = TypeVar("_WrappedMethod", bound=Union[FunctionType, Callable])
 
 
@@ -44,5 +41,5 @@ def final(method: _WrappedMethod) -> _WrappedMethod:
     :raises AssertionError: if there exists a match in sub classes for the method name
     :return: method
     """
-    setattr(method, "__finalized__", True)
+    setattr(method, "__final__", True)
     return method
