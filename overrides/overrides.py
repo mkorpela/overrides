@@ -21,7 +21,7 @@ import sys
 from types import FunctionType
 from typing import Callable, List, Optional, Tuple, TypeVar, Union, overload
 
-__VERSION__ = "7.2.0"
+__VERSION__ = "7.3.0"
 
 from overrides.signature import ensure_signature_is_compatible
 
@@ -95,7 +95,9 @@ def overrides(
 
 
 def _overrides(
-    method: _WrappedMethod, check_signature: bool, check_at_runtime: bool,
+    method: _WrappedMethod,
+    check_signature: bool,
+    check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
     global_vars = getattr(method, "__globals__", None)

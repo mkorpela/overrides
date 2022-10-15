@@ -17,14 +17,16 @@ with open(join(CURDIR, "README.rst")) as f:
 
 setup(
     name="overrides",
-    version="7.2.0",
+    version="7.3.0",
     description=desc,
     long_description=LONG_DESCRIPTION,
     author=name,
     author_email=address,
     url="https://github.com/mkorpela/overrides",
     packages=find_packages(),
-    package_data={"overrides": ["*.pyi", "py.typed"],},
+    package_data={
+        "overrides": ["*.pyi", "py.typed"],
+    },
     include_package_data=True,
     install_requires=['typing;python_version<"3.5"'],
     python_requires=">=3.6",
