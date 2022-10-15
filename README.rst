@@ -7,8 +7,7 @@ overrides
 .. image:: http://pepy.tech/badge/overrides
   :target: http://pepy.tech/project/overrides
 
-A decorator ``@override`` that verifies that a method that should override an inherited method actually does, and
-that.
+A decorator ``@override`` that verifies that a method that should override an inherited method actually does.
 
 Copies the docstring of the inherited method to the overridden method.
 
