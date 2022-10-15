@@ -74,7 +74,7 @@ def overrides(
 
     class SubClass(SuperClass):
 
-        @overrides
+        @override
         def method(self):
             return 1
 

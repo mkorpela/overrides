@@ -1,6 +1,6 @@
 from typing import Any, Type, Union
 
-from overrides import overrides
+from overrides import override
 
 
 class SuperbClass:
@@ -29,44 +29,44 @@ class SuperbClass:
 
 
 class ForwardReferencer(SuperbClass):
-    @overrides
+    @override
     def foo(self, x: "ForwardReferencer") -> "ForwardReferencer":
         pass
 
 
 class ClassMethodOverrider(SuperbClass):
     @classmethod
-    @overrides
+    @override
     def class_method(cls):
         pass
 
 
 class StaticMethodOverrider(SuperbClass):
     @staticmethod
-    @overrides
+    @override
     def static_method(param: Union[str, bool]) -> int:
         return 3 if param == "bar" else 2
 
 
 class NormalMethodOverrider(SuperbClass):
-    @overrides
+    @override
     def normal_method(self, x: int, y: str = "zoo", *args, **kwargs) -> bool:
         return x % 3 == 1 or y in kwargs or x == len(args)
 
 
 class OverridesWithSignatureIgnore(SuperbClass):
-    @overrides(check_signature=False)
+    @override(check_signature=False)
     def normal_method(self, x: int) -> bool:
         return x % 2 == 1
 
 
 class SelfTypedOverride(SuperbClass):
-    @overrides(check_at_runtime=True)
+    @override(check_at_runtime=True)
     def self_typed_method(self: "SelfTypedOverride") -> "SelfTypedOverride":
         return self
 
     @classmethod
-    @overrides(check_at_runtime=True)
+    @override(check_at_runtime=True)
     def self_typed_class_method(cls: "Type[SelfTypedOverride]") -> None:
         return None
 
@@ -77,7 +77,7 @@ class A:
 
 
 class B(A):
-    @overrides
+    @override
     def foo(self: str):
         pass
 
@@ -91,7 +91,7 @@ def test_typed_subclass_in_same_package_is_an_error():
     try:
 
         class TypedSubclass(UntypedBaseClass):
-            @overrides
+            @override
             def do_something(self, arg1: str, arg2: Any = None) -> Any:
                 pass
 

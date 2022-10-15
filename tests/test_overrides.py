@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from typing import Generic, TypeVar
 
 import test_somepackage
-from overrides import overrides
+from overrides import override
 
 TObject = TypeVar("TObject", bound="Foo")
 
@@ -21,7 +21,7 @@ class SubClassOfGeneric(Generic[TObject]):
 
 
 class SubSubClassOfGeneric(SubClassOfGeneric["SubSubClassOfGeneric"]):
-    @overrides
+    @override
     def some_method(self):
         return 17
 
@@ -43,49 +43,49 @@ class SuperClass(object):
 
 
 class SubClass(SuperClass):
-    @overrides
+    @override
     def some_method(self):
         return "sub"
 
 
 class Subber(SuperClass):
-    @overrides
+    @override
     def some_method(self):
         """Subber"""
         return 1
 
 
 class Sub2(test_somepackage.SomeClass, SuperClass):
-    @overrides
+    @override
     def somewhat_fun_method(self):
         return "foo"
 
-    @overrides
+    @override
     def some_method(self):
         pass
 
 
 class SubclassOfInt(int):
-    @overrides
+    @override
     def __str__(self):
         return "subclass of int"
 
 
 class CheckAtRuntime(SuperClass):
-    @overrides(check_at_runtime=True)
+    @override(check_at_runtime=True)
     def some_method(self, x):
         pass
 
 
 class StaticMethodOverridePass(SuperClass):
     @staticmethod
-    @overrides
+    @override
     def this_is_static(x, y, z, *args):
         pass
 
 
 class InnerClassOverride(SuperClass):
-    @overrides
+    @override
     class SomeClass:
         def check(self):
             return 1
@@ -118,7 +118,7 @@ class OverridesTests(unittest.TestCase):
         try:
 
             class ShouldFail(SuperClass):
-                @overrides
+                @override
                 def somo_method(self):
                     pass
 
@@ -131,7 +131,7 @@ class OverridesTests(unittest.TestCase):
 
             class StaticMethodOverrideFail(SuperClass):
                 @staticmethod
-                @overrides
+                @override
                 def this_is_static(k, y, z):
                     pass
 
@@ -154,7 +154,7 @@ class OverridesTests(unittest.TestCase):
 
     def test_overrides_builtin_method_correct_signature(self):
         class SubclassOfInt(int):
-            @overrides
+            @override
             def bit_length(self):
                 return super().bit_length()
 
@@ -172,7 +172,7 @@ class OverridesTests(unittest.TestCase):
         with expected_error:
 
             class SubclassOfInt(int):
-                @overrides
+                @override
                 def bit_length(self, _):
                     "This will fail, bit_length takes in no arguments"
 

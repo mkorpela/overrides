@@ -23,7 +23,7 @@ def final(method: _WrappedMethod) -> _WrappedMethod:
     """Decorator to indicate that the decorated method is finalized and cannot be overridden.
     The decorator code is executed while loading class. Using this method
     should have minimal runtime performance implications.
-    Currently, only methods with @overrides are checked.
+    Currently, only methods with @override are checked.
 
     How to use:
     from overrides import final
@@ -34,7 +34,7 @@ def final(method: _WrappedMethod) -> _WrappedMethod:
           return 2
 
     class SubClass(SuperClass):
-        @overrides
+        @override
         def method(self): #causes an error
             return 1
 

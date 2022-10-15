@@ -7,9 +7,12 @@ overrides
 .. image:: http://pepy.tech/badge/overrides
   :target: http://pepy.tech/project/overrides
 
-A decorator that verifies that a method that should override an inherited method actually does, and
-that copies the docstring of the inherited method to the overridden method. Since signature 
-validation and docstring inheritance are performed on class creation and not on class instantiation, 
+A decorator ``@override`` that verifies that a method that should override an inherited method actually does, and
+that.
+
+Copies the docstring of the inherited method to the overridden method.
+
+Since signature validation and docstring inheritance are performed on class creation and not on class instantiation,
 this library significantly improves the safety and experience of creating class hierarchies in 
 Python without significantly impacting performance. See https://stackoverflow.com/q/1167617 for the
 initial inspiration for this library.
@@ -53,11 +56,11 @@ Compatible with Python 3.6+.
 Usage
 -----
 
-Use ``@overrides`` to indicate that a subclass method should override a superclass method.
+Use ``@override`` to indicate that a subclass method should override a superclass method.
 
 .. code-block:: python
 
-    from overrides import overrides
+    from overrides import override
 
     class SuperClass:
 
@@ -70,20 +73,20 @@ Use ``@overrides`` to indicate that a subclass method should override a supercla
 
     class SubClass(SuperClass):
 
-        @overrides
+        @override
         def foo(self):
             return 2
 
-        @overrides
+        @override
         def bar(self, y) -> int: # Raises, because the signature is not compatible.
             return y
             
-        @overrides
+        @override
         def zoo(self): # Raises, because does not exist in the super class.
             return "foobarzoo"
 
 Use ``EnforceOverrides`` to require subclass methods that shadow superclass methods to be decorated 
-with ``@overrides``.
+with ``@override``.
 
 .. code-block:: python
  
@@ -96,7 +99,7 @@ with ``@overrides``.
 
     class SubClass(SuperClass):
 
-        def foo(self): # Raises, because @overrides is missing.
+        def foo(self): # Raises, because @override is missing.
             return 2
 
 Use ``@final`` to indicate that a superclass method cannot be overriden.
@@ -104,7 +107,7 @@ With Python 3.11 and above ``@final`` is directly `typing.final <https://docs.py
 
 .. code-block:: python
 
-    from overrides import EnforceOverrides, final
+    from overrides import EnforceOverrides, final, override
 
     class SuperClass(EnforceOverrides):
 
@@ -114,15 +117,15 @@ With Python 3.11 and above ``@final`` is directly `typing.final <https://docs.py
 
     class SubClass(SuperClass):
 
-        @overrides
+        @override
         def foo(self): # Raises, because overriding a final method is forbidden.
             return 2
 
-Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@overrides``.
+Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@override``.
 
 .. code-block:: python
 
-    from overrides import overrides
+    from overrides import override
 
     class SuperClass:
 
@@ -133,7 +136,7 @@ Note that ``@classmethod`` and ``@staticmethod`` must be declared before ``@over
     class SubClass(SuperClass):
 
         @staticmethod
-        @overrides
+        @override
         def foo(x):
             return 2
 
@@ -144,12 +147,12 @@ Flags of control
 .. code-block:: python
 
     # To prevent all signature checks do:
-    @overrides(check_signature=False)
+    @override(check_signature=False)
     def some_method(self, now_this_can_be_funny_and_wrong: str, what_ever: int) -> "Dictirux":
         pass
 
     # To do the check only at runtime and solve some forward reference problems
-    @overrides(check_at_runtime=True)
+    @override(check_at_runtime=True)
     def some_other_method(self, ..) -> "SomethingDefinedLater":
         pass
 

@@ -1,5 +1,5 @@
 from typing import Callable, Type
-from overrides import overrides
+from overrides import override
 
 
 class SuperClass:
@@ -24,6 +24,6 @@ def test_my_func() -> None:
 
     @my_decorator(my_object.my_name)
     class SubClass(SuperClass):
-        @overrides
+        @override
         def method(self) -> int:
             return 1
