@@ -1,7 +1,7 @@
 import unittest
 from typing import Optional, TypeVar, Union
 
-from overrides import EnforceOverrides, final, overrides
+from overrides import EnforceOverrides, final, override
 from overrides.signature import ensure_signature_is_compatible
 
 
@@ -40,7 +40,7 @@ class EnforceTests(unittest.TestCase):
         class Subclazz(Enforcing):
             classVariableIsOk = "OK!"
 
-            @overrides
+            @override
             def nonfinal1(self, param: int) -> str:
                 return "2"
 
@@ -74,7 +74,7 @@ class EnforceTests(unittest.TestCase):
     def test_enforcing_when_property_overriden(self):
         class PropertyOverrider(Enforcing):
             @property
-            @overrides
+            @override
             def nonfinal_property(self):
                 return "subclass_property"
 
@@ -86,14 +86,14 @@ class EnforceTests(unittest.TestCase):
         with self.assertRaises(TypeError):
 
             class Incompatible(Enforcing):
-                @overrides
+                @override
                 def nonfinal1(self, param: str):
                     pass
 
     def test_enforcing_when_staticmethod_overriden(self):
         class StaticMethodOverrider(Enforcing):
             @staticmethod
-            @overrides
+            @override
             def nonfinal_staticmethod():
                 return "subclass_staticmethod"
 
@@ -105,7 +105,7 @@ class EnforceTests(unittest.TestCase):
     def test_enforcing_when_classmethod_overriden(self):
         class ClassMethodOverrider(Enforcing):
             @classmethod
-            @overrides
+            @override
             def nonfinal_classmethod(cls):
                 return "subclass_classmethod"
 

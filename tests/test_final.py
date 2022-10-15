@@ -1,5 +1,5 @@
 import unittest
-from overrides import overrides, final
+from overrides import override, final
 import test_somefinalpackage
 
 
@@ -18,7 +18,7 @@ class SuperClass(object):
 
 
 class SubClass(SuperClass):
-    @overrides
+    @override
     def some_method(self):
         return "sub"
 
@@ -28,11 +28,11 @@ class SubClass(SuperClass):
 
 
 class Sub2(test_somefinalpackage.SomeClass, SuperClass):
-    @overrides
+    @override
     def somewhat_fun_method(self):
         return "foo"
 
-    @overrides
+    @override
     def some_method(self):
         pass
 
@@ -55,11 +55,11 @@ class FinalTests(unittest.TestCase):
         try:
 
             class SubClassFail(SuperClass):
-                @overrides
+                @override
                 def some_method(self):
                     return "subfail"
 
-                @overrides
+                @override
                 def some_finalized_method(self):
                     pass
 
@@ -71,7 +71,7 @@ class FinalTests(unittest.TestCase):
         try:
 
             class SubClassFail(SuperClass):
-                @overrides
+                @override
                 class SomeFinalClass:
                     pass
 
@@ -83,15 +83,15 @@ class FinalTests(unittest.TestCase):
         try:
 
             class Sub2Fail(test_somefinalpackage.SomeClass, SuperClass):
-                @overrides
+                @override
                 def somewhat_fun_method(self):
                     return "foo"
 
-                @overrides
+                @override
                 def some_method(self):
                     pass
 
-                @overrides
+                @override
                 def some_finalized_method(self):
                     pass
 
@@ -103,15 +103,15 @@ class FinalTests(unittest.TestCase):
         try:
 
             class Sub3Fail(test_somefinalpackage.SomeClass, SubClass):
-                @overrides
+                @override
                 def somewhat_fun_method(self):
                     return "foo"
 
-                @overrides
+                @override
                 def some_method(self):
                     pass
 
-                @overrides
+                @override
                 def some_finalized_method(self):
                     pass
 
@@ -123,15 +123,15 @@ class FinalTests(unittest.TestCase):
         try:
 
             class Sub4Fail(test_somefinalpackage.SomeClass, SubClass):
-                @overrides
+                @override
                 def somewhat_fun_method(self):
                     return "foo"
 
-                @overrides
+                @override
                 def some_method(self):
                     pass
 
-                @overrides
+                @override
                 def another_finalized(self):
                     pass
 
@@ -143,15 +143,15 @@ class FinalTests(unittest.TestCase):
         try:
 
             class Sub5Fail(test_somefinalpackage.SomeClass, SubClass):
-                @overrides
+                @override
                 def somewhat_fun_method(self):
                     return "foo"
 
-                @overrides
+                @override
                 def some_method(self):
                     pass
 
-                @overrides
+                @override
                 def some_finalized_method(self):
                     pass
 

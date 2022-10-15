@@ -1,4 +1,4 @@
-from overrides import overrides
+from overrides import override
 
 
 class Parent:
@@ -7,6 +7,6 @@ class Parent:
 
 
 class Child(Parent):
-    @overrides
+    @override
     def metoda(self) -> "Child":
         return self

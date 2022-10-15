@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from overrides import overrides
+from overrides import override
 
 
 class Parent:
@@ -9,6 +9,6 @@ class Parent:
 
 
 class Child(Parent):
-    @overrides
+    @override
     def execute(self, *args, **kwargs) -> Tuple[str, int]:
         return "moi", 1
