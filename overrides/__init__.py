@@ -5,9 +5,8 @@ if sys.version_info < (3, 11):
     from overrides.final import final
 else:
     from typing import final
-from overrides.overrides import __VERSION__, overrides
+from overrides.overrides import __VERSION__, overrides, override
 
-override = overrides
 
 __all__ = [
     "__VERSION__",

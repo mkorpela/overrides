@@ -94,6 +94,37 @@ def overrides(
         )
 
 
+@overload
+def override(
+    method: None = None,
+    *,
+    check_signature: bool = True,
+    check_at_runtime: bool = False,
+) -> _DecoratorMethod:
+    ...
+
+
+@overload
+def override(
+    method: _WrappedMethod,
+    *,
+    check_signature: bool = True,
+    check_at_runtime: bool = False,
+) -> _WrappedMethod:
+    ...
+
+
+def override(
+    method: Optional[_WrappedMethod] = None,
+    *,
+    check_signature: bool = True,
+    check_at_runtime: bool = False,
+) -> Union[_DecoratorMethod, _WrappedMethod]:
+    return overrides(
+        method, check_signature=check_signature, check_at_runtime=check_at_runtime
+    )
+
+
 def _overrides(
     method: _WrappedMethod,
     check_signature: bool,
