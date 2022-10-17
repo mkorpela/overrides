@@ -60,11 +60,6 @@ def overrides(
     The decorator code is executed while loading class. Using this method
     should have minimal runtime performance implications.
 
-    This is based on my idea about how to do this and fwc:s highly improved
-    algorithm for the implementation fwc:s
-    algorithm : http://stackoverflow.com/a/14631397/308189
-    my answer : http://stackoverflow.com/a/8313042/308189
-
     How to use:
     from overrides import overrides
 
@@ -74,7 +69,7 @@ def overrides(
 
     class SubClass(SuperClass):
 
-        @override
+        @overrides
         def method(self):
             return 1
 
@@ -120,15 +115,42 @@ def override(
     check_signature: bool = True,
     check_at_runtime: bool = False,
 ) -> Union[_DecoratorMethod, _WrappedMethod]:
-    return overrides(
-        method, check_signature=check_signature, check_at_runtime=check_at_runtime
-    )
+    """Decorator to indicate that the decorated method overrides a method in
+    superclass.
+    The decorator code is executed while loading class. Using this method
+    should have minimal runtime performance implications.
+
+    How to use:
+    from overrides import override
+
+    class SuperClass(object):
+        def method(self):
+          return 2
+
+    class SubClass(SuperClass):
+
+        @override
+        def method(self):
+            return 1
+
+    :param check_signature: Whether or not to check the signature of the overridden method.
+    :param check_at_runtime: Whether or not to check the overridden method at runtime.
+    :raises AssertionError: if no match in super classes for the method name
+    :return: method with possibly added (if the method doesn't have one)
+        docstring from super class
+    """
+    if method is not None:
+        return _overrides(method, check_signature, check_at_runtime)
+    else:
+        return functools.partial(
+            overrides,
+            check_signature=check_signature,
+            check_at_runtime=check_at_runtime,
+        )
 
 
 def _overrides(
-    method: _WrappedMethod,
-    check_signature: bool,
-    check_at_runtime: bool,
+    method: _WrappedMethod, check_signature: bool, check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
     global_vars = getattr(method, "__globals__", None)
