@@ -156,7 +156,10 @@ def _overrides(
     global_vars = getattr(method, "__globals__", None)
     if global_vars is None:
         global_vars = vars(sys.modules[method.__module__])
-    for super_class in _get_base_classes(sys._getframe(3), global_vars):
+    super_classes = _get_base_classes(sys._getframe(3), global_vars)
+    if not super_classes:
+        return method
+    for super_class in super_classes:
         if hasattr(super_class, method.__name__):
             if check_at_runtime:
 
