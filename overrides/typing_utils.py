@@ -12,7 +12,6 @@ Backport Python3.8+ typing utils &amp; issubtype &amp; more
 ```
 """
 
-
 import collections.abc
 import io
 import itertools
@@ -41,9 +40,7 @@ if hasattr(types, "UnionType"):
 else:
     UnionType = None
 
-
 unknown = None
-
 
 BUILTINS_MAPPING = {
     typing.List: list,
@@ -56,7 +53,6 @@ BUILTINS_MAPPING = {
     type(None): None,
 }
 
-
 STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
     io.TextIOWrapper: typing.TextIO,
     io.TextIOBase: typing.TextIO,
@@ -66,9 +62,14 @@ STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
     io.BytesIO: typing.BinaryIO,
 }
 
+if UnionType:
+    def is_union(element: object) -> bool:
+        return element is typing.Union or element is UnionType
 
-def is_union(element: object) -> bool:
-    return element is typing.Union or element is UnionType
+else:
+    def is_union(element: object) -> bool:
+        return element is typing.Union
+
 
 def optional_all(elements) -> typing.Optional[bool]:
     if all(elements):
@@ -184,7 +185,7 @@ def get_args(type_) -> typing.Tuple:
         res = _getter(type_)
     elif hasattr(typing.List, "_special"):  # python 3.7
         if (
-            isinstance(type_, GenericClass) and not type_._special  # type: ignore
+                isinstance(type_, GenericClass) and not type_._special  # type: ignore
         ):  # backport for python 3.8
             res = type_.__args__  # type: ignore
             if get_origin(type_) is collections.abc.Callable and res[0] is not Ellipsis:
@@ -282,9 +283,9 @@ def _is_origin_subtype(left: OriginType, right: OriginType) -> bool:
         return True
 
     if (
-        left is not None
-        and left in STATIC_SUBTYPE_MAPPING
-        and right == STATIC_SUBTYPE_MAPPING[left]
+            left is not None
+            and left in STATIC_SUBTYPE_MAPPING
+            and right == STATIC_SUBTYPE_MAPPING[left]
     ):
         return True
 
@@ -305,9 +306,9 @@ NormalizedTypeArgs = typing.Union[
 
 
 def _is_origin_subtype_args(
-    left: "NormalizedTypeArgs",
-    right: "NormalizedTypeArgs",
-    forward_refs: typing.Optional[typing.Mapping[str, type]],
+        left: "NormalizedTypeArgs",
+        right: "NormalizedTypeArgs",
+        forward_refs: typing.Optional[typing.Mapping[str, type]],
 ) -> typing.Optional[bool]:
     if isinstance(left, frozenset):
         if not isinstance(right, frozenset):
@@ -324,18 +325,18 @@ def _is_origin_subtype_args(
         )
 
     if isinstance(left, collections.abc.Sequence) and not isinstance(
-        left, NormalizedType
+            left, NormalizedType
     ):
         if not isinstance(right, collections.abc.Sequence) or isinstance(
-            right, NormalizedType
+                right, NormalizedType
         ):
             return False
 
         if (
-            left
-            and left[-1].origin is not Ellipsis
-            and right
-            and right[-1].origin is Ellipsis
+                left
+                and left[-1].origin is not Ellipsis
+                and right
+                and right[-1].origin is Ellipsis
         ):
             # Tuple[type, type] <> Tuple[type, ...]
             return all(_is_origin_subtype_args(l, right[0], forward_refs) for l in left)
@@ -357,11 +358,10 @@ def _is_origin_subtype_args(
 
 
 def _is_normal_subtype(
-    left: NormalizedType,
-    right: NormalizedType,
-    forward_refs: typing.Optional[typing.Mapping[str, type]],
+        left: NormalizedType,
+        right: NormalizedType,
+        forward_refs: typing.Optional[typing.Mapping[str, type]],
 ) -> typing.Optional[bool]:
-
     if isinstance(left.origin, ForwardRef):
         left = normalize(eval_forward_ref(left.origin, forward_refs=forward_refs))
 
@@ -392,7 +392,7 @@ def _is_normal_subtype(
 
     # TypeVar
     if isinstance(left.origin, typing.TypeVar) and isinstance(
-        right.origin, typing.TypeVar
+            right.origin, typing.TypeVar
     ):
         if left.origin is right.origin:
             return True
@@ -425,7 +425,7 @@ def _is_normal_subtype(
 
 
 def issubtype(
-    left: Type, right: Type, forward_refs: typing.Optional[dict] = None,
+        left: Type, right: Type, forward_refs: typing.Optional[dict] = None,
 ) -> typing.Optional[bool]:
     """Check that the left argument is a subtype of the right.
     For unions, check if the type arguments of the left is a subset of the right.
