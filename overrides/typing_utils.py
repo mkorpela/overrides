@@ -36,6 +36,11 @@ if hasattr(typing, "_TypedDictMeta"):
 else:
     _TypedDictMeta = None
 
+if hasattr(types, "UnionType"):
+    UnionType = getattr(types, "UnionType")
+else:
+    UnionType = None
+
 
 unknown = None
 
@@ -63,7 +68,7 @@ STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
 
 
 def is_union(element: object) -> bool:
-    return element is typing.Union or element is types.UnionType
+    return element is typing.Union or element is UnionType
 
 def optional_all(elements) -> typing.Optional[bool]:
     if all(elements):
