@@ -16,6 +16,7 @@ def test_should_allow_reducing_type():
             return 1
     assert B().f() == 1
 
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="requires Python3.10 or higher")
 def test_should_not_allow_increasing_type():
     with pytest.raises(TypeError):
         class C(A):
