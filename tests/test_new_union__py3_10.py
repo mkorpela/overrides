@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 import pytest
 from overrides import override
 
@@ -14,7 +16,9 @@ def test_should_allow_reducing_type():
         @override
         def f(self) -> int:
             return 1
+
     assert B().f() == 1
+
 
 @pytest.mark.skipif(sys.version_info < (3, 10), reason="requires Python3.10 or higher")
 def test_should_not_allow_increasing_type():
@@ -23,4 +27,5 @@ def test_should_not_allow_increasing_type():
             @override
             def f(self) -> int | str | list[str]:
                 return []
+
         assert False, "should not go here"
