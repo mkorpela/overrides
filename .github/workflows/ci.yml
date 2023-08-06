@@ -27,6 +27,6 @@ jobs:
         run: pytest tests
       - name: Run mypy
         run:  mypy overrides
-      - name: Run mypy static tests (Python=3.10)
-        if: matrix.python == '3.10'
+      - name: Run mypy static tests (Python=3.11)
+        if: matrix.python == '3.11'
         run: ./check_mypy.sh

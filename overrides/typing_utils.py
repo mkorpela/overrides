@@ -16,6 +16,7 @@ Backport Python3.8+ typing utils &amp; issubtype &amp; more
 import collections.abc
 import io
 import itertools
+import types
 import typing
 
 if hasattr(typing, "ForwardRef"):  # python3.8
@@ -60,6 +61,9 @@ STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
     io.BytesIO: typing.BinaryIO,
 }
 
+
+def is_union(element: object) -> bool:
+    return element is typing.Union or element is types.UnionType
 
 def optional_all(elements) -> typing.Optional[bool]:
     if all(elements):
@@ -261,7 +265,7 @@ def normalize(type_: Type) -> NormalizedType:
         return NormalizedType(_normalize_aliases(type_))
     origin = _normalize_aliases(origin)
 
-    if origin is typing.Union:  # sort args when the origin is Union
+    if is_union(origin):  # sort args when the origin is Union
         args = _normalize_args(frozenset(args))
     else:
         args = _normalize_args(args)
@@ -364,13 +368,13 @@ def _is_normal_subtype(
         return True
 
     # Union
-    if right.origin is typing.Union and left.origin is typing.Union:
+    if is_union(right.origin) and is_union(left.origin):
         return _is_origin_subtype_args(left.args, right.args, forward_refs)
-    if right.origin is typing.Union:
+    if is_union(right.origin):
         return optional_any(
             _is_normal_subtype(left, a, forward_refs) for a in right.args
         )
-    if left.origin is typing.Union:
+    if is_union(left.origin):
         return optional_all(
             _is_normal_subtype(a, right, forward_refs) for a in left.args
         )
