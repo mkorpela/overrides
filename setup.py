@@ -17,7 +17,7 @@ with open(join(CURDIR, "README.rst")) as f:
 
 setup(
     name="overrides",
-    version="7.3.1",
+    version="7.4.0",
     description=desc,
     long_description=LONG_DESCRIPTION,
     author=name,
