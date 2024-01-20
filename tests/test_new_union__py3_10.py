@@ -23,6 +23,7 @@ def test_should_allow_reducing_type():
 @pytest.mark.skipif(sys.version_info < (3, 10), reason="requires Python3.10 or higher")
 def test_should_not_allow_increasing_type():
     with pytest.raises(TypeError):
+
         class C(A):
             @override
             def f(self) -> int | str | list[str]:

@@ -18,7 +18,7 @@ import dis
 import functools
 import inspect
 import sys
-from types import FunctionType
+from types import FrameType, FunctionType
 from typing import Callable, List, Optional, Tuple, TypeVar, Union, overload
 
 __VERSION__ = "7.5.0"
@@ -150,7 +150,9 @@ def override(
 
 
 def _overrides(
-    method: _WrappedMethod, check_signature: bool, check_at_runtime: bool,
+    method: _WrappedMethod,
+    check_signature: bool,
+    check_at_runtime: bool,
 ) -> _WrappedMethod:
     setattr(method, "__override__", True)
     global_vars = getattr(method, "__globals__", None)
@@ -196,7 +198,7 @@ def _get_base_classes(frame, namespace):
     ]
 
 
-def _get_base_class_names(frame) -> List[List[str]]:
+def _get_base_class_names(frame: FrameType) -> List[List[str]]:
     """Get baseclass names from the code object"""
     extends: List[Tuple[str, str]] = []
     add_last_step = True
@@ -208,15 +210,19 @@ def _get_base_class_names(frame) -> List[List[str]]:
         if not add_last_step:
             extends = []
             add_last_step = True
-        if instruction.opname == "LOAD_NAME":
+
+        # Combine LOAD_NAME and LOAD_GLOBAL as they have similar functionality
+        if instruction.opname in ["LOAD_NAME", "LOAD_GLOBAL"]:
             extends.append(("name", instruction.argval))
-        elif instruction.opname == "LOAD_ATTR":
+
+        elif instruction.opname == "LOAD_ATTR" and extends and extends[-1][0] == "name":
             extends.append(("attr", instruction.argval))
-        elif instruction.opname == "LOAD_GLOBAL":
-            extends.append(("name", instruction.argval))
+
+        # Reset on other instructions
         else:
             add_last_step = False
 
+    # Extracting class names
     items: List[List[str]] = []
     previous_item: List[str] = []
     for t, s in extends:
@@ -226,8 +232,10 @@ def _get_base_class_names(frame) -> List[List[str]]:
             previous_item = [s]
         else:
             previous_item += [s]
+
     if previous_item:
         items.append(previous_item)
+
     return items
 
 
