@@ -54,6 +54,12 @@ class Subber(SuperClass):
         """Subber"""
         return 1
 
+class Nest:
+    class First:
+        class Second:
+            def foo(self):
+                pass
+
 
 class Sub2(test_somepackage.SomeClass, SuperClass):
     @override
@@ -89,6 +95,11 @@ class InnerClassOverride(SuperClass):
     class SomeClass:
         def check(self):
             return 1
+
+class ChildOfNested(Nest.First.Second):
+    @override
+    def foo(self):
+        pass
 
 
 class OverridesTests(unittest.TestCase):
