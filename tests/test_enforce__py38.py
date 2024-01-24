@@ -1,5 +1,5 @@
 import unittest
-from typing import Optional, TypeVar, Union, Literal
+from typing import Optional, TypeVar, Union
 
 from overrides import EnforceOverrides, final, override
 from overrides.signature import ensure_signature_is_compatible
@@ -33,18 +33,6 @@ class Enforcing(EnforceOverrides):
     @classmethod
     def nonfinal_classmethod(cls):
         return "super_classmethod"
-
-
-Lit = Literal["foo", "bar"]
-
-class MyBaseClass(EnforceOverrides):
-    def my_method(self, lit : Lit) -> None:
-        return
-
-class MySubClass(MyBaseClass):
-    @override
-    def my_method(self, lit : Lit) -> None:
-        return
 
 
 class EnforceTests(unittest.TestCase):
