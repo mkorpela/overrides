@@ -205,7 +205,6 @@ def _get_base_class_names(frame: FrameType) -> List[List[str]]:
     add_last_step = True
 
     for instruction in dis.get_instructions(frame.f_code):
-        print(f"{instruction.offset} : {instruction.opname} {instruction.argval}")
         if instruction.offset > frame.f_lasti:
             break
         if instruction.opcode not in dis.hasname:
@@ -216,6 +215,8 @@ def _get_base_class_names(frame: FrameType) -> List[List[str]]:
 
         # Combine LOAD_NAME and LOAD_GLOBAL as they have similar functionality
         if instruction.opname in ["LOAD_NAME", "LOAD_GLOBAL"]:
+            if current_item:
+                items.append(current_item)
             current_item = [instruction.argval]
 
         elif instruction.opname == "LOAD_ATTR" and current_item:
