@@ -54,6 +54,7 @@ class Subber(SuperClass):
         """Subber"""
         return 1
 
+
 class Nest:
     class First:
         class Second:
@@ -95,6 +96,7 @@ class InnerClassOverride(SuperClass):
     class SomeClass:
         def check(self):
             return 1
+
 
 class ChildOfNested(Nest.First.Second):
     @override

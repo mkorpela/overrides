@@ -200,42 +200,30 @@ def _get_base_classes(frame, namespace):
 
 def _get_base_class_names(frame: FrameType) -> List[List[str]]:
     """Get baseclass names from the code object"""
-    extends: List[Tuple[str, str]] = []
-    add_last_step = True
+    current_item: List[str] = []
+    items: List[List[str]] = []
+
     for instruction in dis.get_instructions(frame.f_code):
+        print(f"{instruction.offset} : {instruction.opname} {instruction.argval}")
         if instruction.offset > frame.f_lasti:
             break
         if instruction.opcode not in dis.hasname:
             continue
-        if not add_last_step:
-            extends = []
-            add_last_step = True
 
         # Combine LOAD_NAME and LOAD_GLOBAL as they have similar functionality
         if instruction.opname in ["LOAD_NAME", "LOAD_GLOBAL"]:
-            extends.append(("name", instruction.argval))
+            current_item = [instruction.argval]
 
-        elif instruction.opname == "LOAD_ATTR" and extends and extends[-1][0] == "name":
-            extends.append(("attr", instruction.argval))
+        elif instruction.opname == "LOAD_ATTR" and current_item:
+            current_item.append(instruction.argval)
 
         # Reset on other instructions
-        else:
-            add_last_step = False
+        elif current_item:
+            items.append(current_item)
+            current_item = []
 
-    # Extracting class names
-    items: List[List[str]] = []
-    previous_item: List[str] = []
-    for t, s in extends:
-        if t == "name":
-            if previous_item:
-                items.append(previous_item)
-            previous_item = [s]
-        else:
-            previous_item += [s]
-
-    if previous_item:
-        items.append(previous_item)
-
+    if current_item:
+        items.append(current_item)
     return items
 
 
