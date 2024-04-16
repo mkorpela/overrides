@@ -1,4 +1,4 @@
-from overrides.enforce import EnforceOverrides
+from overrides.enforce import EnforceOverrides, EnforceOverridesMeta
 import sys
 
 if sys.version_info < (3, 11):
@@ -14,4 +14,5 @@ __all__ = [
     "overrides",
     "final",
     "EnforceOverrides",
+    "EnforceOverridesMeta",
 ]
