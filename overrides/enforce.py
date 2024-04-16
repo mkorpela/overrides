@@ -1,3 +1,4 @@
+import types
 from abc import ABCMeta
 
 
@@ -7,7 +8,9 @@ class EnforceOverridesMeta(ABCMeta):
         for method in dir(mcls):
             if not method.startswith("__") and method != "mro":
                 value = getattr(mcls, method)
-                if not isinstance(value, (bool, str, int, float, tuple, list, dict)):
+                if not isinstance(
+                    value, (bool, str, int, float, tuple, list, dict, types.MethodType)
+                ):
                     setattr(getattr(mcls, method), "__ignored__", True)
 
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
