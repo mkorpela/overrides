@@ -422,6 +422,13 @@ def _is_normal_subtype(
     if not right.args:
         return _is_origin_subtype(left.origin, right.origin)
 
+    # Callable
+    if isinstance(left.origin, typing.Callable) and isinstance(right.origin, typing.Callable):  # type: ignore
+        # Callable input arguments are contravariant
+        inputs_correct = _is_origin_subtype_args(right.args[0], left.args[0], forward_refs)
+        outputs_correct = _is_origin_subtype_args(tuple([left.args[-1]]), tuple([right.args[-1]]), forward_refs)
+        return inputs_correct and outputs_correct
+
     if _is_origin_subtype(left.origin, right.origin):
         return _is_origin_subtype_args(left.args, right.args, forward_refs)
 
