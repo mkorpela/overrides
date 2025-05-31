@@ -47,11 +47,14 @@ BUILTINS_MAPPING = {
     typing.Set: set,
     typing.Dict: dict,
     typing.Tuple: tuple,
-    typing.ByteString: bytes,  # https://docs.python.org/3/library/typing.html#typing.ByteString
     typing.Callable: collections.abc.Callable,
     typing.Sequence: collections.abc.Sequence,
     type(None): None,
 }
+
+if hasattr(typing, "ByteString"):
+    # https://docs.python.org/3/library/typing.html#typing.ByteString
+    BUILTINS_MAPPING[typing.ByteString] = bytes
 
 STATIC_SUBTYPE_MAPPING: typing.Dict[type, typing.Type] = {
     io.TextIOWrapper: typing.TextIO,
