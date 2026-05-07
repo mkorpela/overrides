@@ -46,7 +46,7 @@ docstrings degrade the quality of tooltips and completions that can be provided 
 Installation
 ------------
 
-Compatible with Python 3.6+.
+Compatible with Python 3.10+.
 
 .. code-block:: bash
 
