@@ -158,7 +158,8 @@ def _overrides(
     global_vars = getattr(method, "__globals__", None)
     if global_vars is None:
         global_vars = vars(sys.modules[method.__module__])
-    for super_class in _get_base_classes(sys._getframe(3), global_vars):
+    frame = sys._getframe(3)
+    for super_class in _get_base_classes(frame, global_vars, frame.f_locals):
         if hasattr(super_class, method.__name__):
             if check_at_runtime:
 
@@ -191,9 +192,9 @@ def _validate_method(method, super_class, check_signature):
         ensure_signature_is_compatible(super_method, method, is_static)
 
 
-def _get_base_classes(frame, namespace):
+def _get_base_classes(frame, namespace, local_vars=None):
     return [
-        _get_base_class(class_name_components, namespace)
+        _get_base_class(class_name_components, namespace, local_vars)
         for class_name_components in _get_base_class_names(frame)
     ]
 
@@ -234,9 +235,12 @@ def _get_base_class_names(frame: FrameType) -> List[List[str]]:
     return items
 
 
-def _get_base_class(components, namespace):
+def _get_base_class(components, namespace, local_vars=None):
     try:
-        obj = namespace[components[0]]
+        if local_vars is not None and components[0] in local_vars:
+            obj = local_vars[components[0]]
+        else:
+            obj = namespace[components[0]]
     except KeyError:
         if isinstance(namespace["__builtins__"], dict):
             obj = namespace["__builtins__"][components[0]]
