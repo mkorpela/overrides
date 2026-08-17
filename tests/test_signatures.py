@@ -185,6 +185,36 @@ def test_widening_callable_parameter_arg_type_is_an_error():
         pass
 
 
+class CallableEllipsisParamBase:
+    def f(self, callback: Callable[[CallableArgX], None]) -> None:
+        pass
+
+
+class CallableEllipsisParamOverride(CallableEllipsisParamBase):
+    # Callable[..., X] means "unknown/any parameters" and must not be
+    # treated as a plain parameter-type sequence -- it should be accepted
+    # rather than raising when compared against an explicit parameter list.
+    @override
+    def f(self, callback: Callable[..., None]) -> None:
+        pass
+
+
+class CallableEllipsisParamBaseReverse:
+    def f(self, callback: Callable[..., None]) -> None:
+        pass
+
+
+class CallableEllipsisParamOverrideReverse(CallableEllipsisParamBaseReverse):
+    @override
+    def f(self, callback: Callable[[CallableArgX], None]) -> None:
+        pass
+
+
+def test_callable_ellipsis_parameter_list_does_not_raise():
+    CallableEllipsisParamOverride().f(lambda x: None)
+    CallableEllipsisParamOverrideReverse().f(lambda x: None)
+
+
 def test_callable_return_type_covariance_is_unaffected():
     CallableReturnWidened().f(lambda: CallableArgX())
 
