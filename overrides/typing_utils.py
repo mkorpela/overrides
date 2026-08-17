@@ -423,6 +423,20 @@ def _is_normal_subtype(
         return _is_origin_subtype(left.origin, right.origin)
 
     if _is_origin_subtype(left.origin, right.origin):
+        if left.origin is collections.abc.Callable and right.origin is collections.abc.Callable:
+            # Callable's normalized args are (parameter_types, return_type).
+            # Parameters are contravariant (the sub's parameters must be
+            # *supertypes* of the super's parameters), while the return
+            # type stays covariant, so the two components can't be
+            # compared with the same, single direction.
+            left_params, left_return = left.args
+            right_params, right_return = right.args
+            return optional_all(
+                [
+                    _is_origin_subtype_args(right_params, left_params, forward_refs),
+                    _is_origin_subtype_args(left_return, right_return, forward_refs),
+                ]
+            )
         return _is_origin_subtype_args(left.args, right.args, forward_refs)
 
     return False
