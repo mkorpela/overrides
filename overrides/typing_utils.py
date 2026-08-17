@@ -423,6 +423,42 @@ def _is_normal_subtype(
         return _is_origin_subtype(left.origin, right.origin)
 
     if _is_origin_subtype(left.origin, right.origin):
+        if left.origin is collections.abc.Callable and right.origin is collections.abc.Callable:
+            # Callable's normalized args are (parameter_types, return_type).
+            # Parameters are contravariant (the sub's parameters must be
+            # *supertypes* of the super's parameters), while the return
+            # type stays covariant, so the two components can't be
+            # compared with the same, single direction.
+            left_params, left_return = left.args
+            right_params, right_return = right.args
+
+            # Callable[..., X] has an Ellipsis in place of a parameter-type
+            # list (a bare NormalizedType, not a sequence of them), meaning
+            # "unknown/any parameters". It isn't comparable element-wise
+            # against an explicit parameter list, so treat either side
+            # using Ellipsis as compatible rather than falling through to
+            # the sequence comparison (which would either mismatch element
+            # shapes or trip the NormalizedType assertions in
+            # _is_origin_subtype_args).
+            left_params_is_ellipsis = (
+                isinstance(left_params, NormalizedType) and left_params.origin is Ellipsis
+            )
+            right_params_is_ellipsis = (
+                isinstance(right_params, NormalizedType) and right_params.origin is Ellipsis
+            )
+            if left_params_is_ellipsis or right_params_is_ellipsis:
+                params_subtype: typing.Optional[bool] = True
+            else:
+                params_subtype = _is_origin_subtype_args(
+                    right_params, left_params, forward_refs
+                )
+
+            return optional_all(
+                [
+                    params_subtype,
+                    _is_origin_subtype_args(left_return, right_return, forward_refs),
+                ]
+            )
         return _is_origin_subtype_args(left.args, right.args, forward_refs)
 
     return False
